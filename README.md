@@ -1,8 +1,15 @@
 
 # 改自https://github.com/shaohui10086/ShareUtil ，在其基础上添加些许功能及优化，改动如下：
+```
     1. 使用rxjava2
     2. 添加小程序分享支持
     3. 部分代码优化
+```
+
+## ChangeLog
+
+#### 2018-02-07
+- 改用rxjava2库，支持小程序分享功能
 
 # ShareUtil
 `ShareUtil`是一个综合性的分享及登录工具库，
@@ -15,18 +22,34 @@
 ![login](/preview/shareutil_login.gif)
 ## Feature
 
-1. 多种分享方式：
+1. 多种分享方式： 纯文字、纯图片、图文混合
     
 2. 支持分享图片本地链接，网络链接或者Bitmap， 不需要考虑各个平台的不一致性。
 
 3. 支持微信、QQ、微博登录并获取登录用户信息
 
+4. 支持小程序分享
+
 ## Usage
 
 ### 使用配置
 
-1. build.gradle 配置
+1. 直接依赖shareutil项目
+
+2. 主项目AnidroidManifest添加以下代码：
+```
+        <activity android:name="me.shaohui.shareutil._ShareActivity"/>
+
+        <activity-alias
+                android:name=".wxapi.WXEntryActivity"
+                android:exported="true"
+                android:targetActivity="me.shaohui.shareutil._ShareActivity"
+                />
+```
+3. build.gradle 配置
 在defaultConfig节点下增加你的qq id信息
+
+项目会提示manifest缺少qq_id ，可忽略
 
         defaultConfig {
         	...
@@ -37,7 +60,7 @@
             ]
             
         }
-2. 在使用之前设置在各个平台申请的Id，以及分享的回调（推荐放在Application的onCreate方法中）
+4. 在使用之前设置在各个平台申请的Id，以及分享的回调（推荐放在Application的onCreate方法中）
     
             // init
             ShareConfig config = ShareConfig.instance()
@@ -88,17 +111,12 @@
 1. QQ不支持纯文字分享，会直接分享失败
 2. 使用Jar文件的版本如下：
 
-        微信版本：3.1.1
-        QQ版本：3.1.0 lite版
-        微博版本: 3.1.4
+        微信版本：com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.4.0
+        QQ版本：libs/open_sdk_r5923_lite.jar
+        微博版本: libs/weiboSDKCore_3.1.4.jar
 3. 分享的bitmap，会在分享之后被回收掉，所以分享之后最好不要再对该bitmap做任何操作。
 4. example 中的代码可以参考，但是不可运行，因为需要保证包名以及签名文件和你申请各个平台id所填写信息保持一致
 5. ShareListener的回调结果仅供参考，不可当做分享是否返回的依据，它并不是那么完全可靠，因为某些操作，例如微博分享取消，但是用户选择了保存草稿，这时候客户端并不会收到回调，所以也就不会调用ShareListener的onCancel
-
-## ChangeLog
-
-#### 2018-02-07
-- 改用rxjava2库，支持小程序分享功能
 
 ## Thanks
 - https://github.com/shaohui10086/ShareUtil
