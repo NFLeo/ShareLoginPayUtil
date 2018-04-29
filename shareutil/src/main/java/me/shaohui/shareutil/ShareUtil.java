@@ -34,7 +34,7 @@ import static me.shaohui.shareutil.ShareLogger.INFO;
 public class ShareUtil {
     /**
      * 测试case
-     *
+     * <p>
      * 1. 本地图片 vs 网络图片
      * 2. 图片大小限制
      * 3. 文字长度限制
@@ -51,6 +51,7 @@ public class ShareUtil {
     private final static int TYPE_MEDIA = 3;
 
     private static int mType;
+    private static boolean mShareImmediate;
     private static int mPlatform;
     private static String mText;
     private static ShareImageObject mShareImageObject;
@@ -84,57 +85,69 @@ public class ShareUtil {
                 break;
             case TYPE_MEDIA:
                 mShareInstance.shareMedia(mPlatform, mTitle, mTargetUrl, mSummary, mMiniId, mMiniPath,
-                        mShareImageObject, activity, mShareListener);
+                        mShareImageObject, mShareImmediate, activity, mShareListener);
                 break;
         }
     }
 
     public static void shareText(Context context, @SharePlatform.Platform int platform, String text,
                                  ShareListener listener) {
-        initShareData(context, TYPE_TEXT, platform, listener, text, null, null, null, null, null, null);
+        initShareData(context, TYPE_TEXT, platform, listener, text, null, false, null, null, null, null, null);
     }
 
     public static void shareImage(Context context, @SharePlatform.Platform final int platform,
-            final Object urlOrPath, ShareListener listener) {
-        initShareData(context, TYPE_IMAGE, platform, listener, null, urlOrPath, null, null, null, null, null);
+                                  final Object urlOrPath, ShareListener listener) {
+        initShareData(context, TYPE_IMAGE, platform, listener, null, urlOrPath, false, null, null, null, null, null);
     }
 
-    public static void shareMedia(Context context, @SharePlatform.Platform int platform,
-            String title, String summary, String targetUrl, Object thumb, ShareListener listener) {
-        initShareData(context, TYPE_MEDIA, platform, listener, null, thumb, summary, targetUrl, title, null, null);
+    public static void shareMedia(Context context, @SharePlatform.Platform int platform, String title, String summary,
+                                  String targetUrl, Object thumb, boolean shareImmediate, ShareListener listener) {
+        initShareData(context, TYPE_MEDIA, platform, listener, null, thumb, shareImmediate, summary, targetUrl, title, null, null);
     }
 
-    public static void shareMedia(Context context, @SharePlatform.Platform int platform,
-            String title, String summary, String targetUrl, Object thumbUrlOrPath, String miniId, String miniPath,
-            ShareListener listener) {
-        initShareData(context, TYPE_MEDIA, platform, listener, null, thumbUrlOrPath, summary, targetUrl, title, miniId, miniPath);
+    public static void shareMedia(Context context, @SharePlatform.Platform int platform, String title,
+                                  String summary, String targetUrl, Object thumb, ShareListener listener) {
+        initShareData(context, TYPE_MEDIA, platform, listener, null, thumb, false, summary, targetUrl, title, null, null);
+    }
+
+    public static void shareMedia(Context context, @SharePlatform.Platform int platform, String title, String summary,
+                                  String targetUrl, Object thumbUrlOrPath, String miniId, String miniPath, ShareListener listener) {
+        initShareData(context, TYPE_MEDIA, platform, listener, null, thumbUrlOrPath, false, summary, targetUrl, title, miniId, miniPath);
+    }
+
+    public static void shareMedia(Context context, @SharePlatform.Platform int platform, String title, String summary,
+                                  String targetUrl, Object thumbUrlOrPath, boolean shareImmediate, String miniId, String miniPath, ShareListener listener) {
+        initShareData(context, TYPE_MEDIA, platform, listener, null, thumbUrlOrPath, shareImmediate, summary, targetUrl, title, miniId, miniPath);
     }
 
     /**
      * deal with share data
-     * @param context         ctx
-     * @param platform        share type
-     * @param title           share title
-     * @param summary         share content
-     * @param targetUrl       targetUrl
-     * @param imageObject     logo   (image url path or bitmap)
-     * @param miniId          miniprogram id
-     * @param miniPath        miniprogram path
-     * @param listener        result listener
+     *
+     * @param context     ctx
+     * @param platform    share type
+     * @param title       share title
+     * @param summary     share content
+     * @param targetUrl   targetUrl
+     * @param imageObject logo   (image url path or bitmap)
+     * @param miniId      miniprogram id
+     * @param miniPath    miniprogram path
+     * @param listener    result listener
      */
     private static void initShareData(Context context, int type, int platform, ShareListener listener,
-                               String text,
-                               Object imageObject,
-                               String summary, String targetUrl, String title, String miniId, String miniPath) {
+                                      String text, Object imageObject, boolean immediate,
+                                      String summary, String targetUrl, String title, String miniId, String miniPath) {
         switch (type) {
             case TYPE_TEXT:
                 mText = text;
                 break;
             case TYPE_IMAGE:
                 mShareImageObject = new ShareImageObject(imageObject);
+                mShareImageObject.setShareImmediate(immediate);
                 break;
             case TYPE_MEDIA:
                 mShareImageObject = new ShareImageObject(imageObject);
+                mShareImageObject.setShareImmediate(immediate);
+                mShareImmediate = immediate;
                 mSummary = summary;
                 mTargetUrl = targetUrl;
                 mTitle = title;
@@ -253,7 +266,7 @@ public class ShareUtil {
         IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
         return api.isWXAppInstalled();
     }
-    
+
     private static class ShareListenerProxy extends ShareListener {
 
         private final ShareListener mShareListener;

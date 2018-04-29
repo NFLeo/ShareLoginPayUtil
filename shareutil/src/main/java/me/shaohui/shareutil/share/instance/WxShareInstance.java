@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.share.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -46,7 +47,6 @@ public class WxShareInstance implements ShareInstance {
     private IWXAPI mIWXAPI;
 
     private static final int THUMB_SIZE = 32 * 1024 * 8;
-
     private static final int TARGET_SIZE = 200;
 
     public WxShareInstance(Context context, String appId) {
@@ -68,6 +68,25 @@ public class WxShareInstance implements ShareInstance {
 
     @Override
     public void shareMedia(final int platform, final String title, final String targetUrl, final String summary, final String miniId, final String miniPath, final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
+        shareFunc(platform, title, targetUrl, summary, miniId, miniPath, shareImageObject, activity, listener);
+    }
+
+    @Override
+    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener) {
+        // 直接分享，外部处理好分享图片
+        if (shareImmediate) {
+            if (shareImageObject.getBytes() != null) {
+                handleshareWx(platform, title, targetUrl, summary, shareImageObject.getBytes(), miniId, miniPath);
+            }
+        } else {
+            shareFunc(platform, title, targetUrl, summary, miniId, miniPath, shareImageObject, activity, listener);
+        }
+    }
+
+    @SuppressLint("CheckResult")
+    private void shareFunc(final int platform, final String title, final String targetUrl, final String summary, final String miniId, final String miniPath,
+                           final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
+
         Flowable.create(new FlowableOnSubscribe<byte[]>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<byte[]> emitter) throws Exception {
@@ -90,30 +109,7 @@ public class WxShareInstance implements ShareInstance {
                 .subscribe(new Consumer<byte[]>() {
                     @Override
                     public void accept(@NonNull byte[] bytes) throws Exception {
-                        WXMediaMessage message;
-                        WXMiniProgramObject miniProgramObject = null;
-                        WXWebpageObject webpageObject = null;
-
-                        if (miniId != null && "".equals(miniId) && miniPath != null && "".equals(miniPath)) {
-                            miniProgramObject = new WXMiniProgramObject();
-                            // 低版本微信将打开网页分享
-                            miniProgramObject.webpageUrl = targetUrl;
-                            // 目标小程序的原始ID
-                            miniProgramObject.userName = miniId;
-                            // 小程序path
-                            miniProgramObject.path = miniPath;
-                        } else {
-                            webpageObject = new WXWebpageObject();
-                            webpageObject.webpageUrl = targetUrl;
-                        }
-
-
-                        message = new WXMediaMessage(miniProgramObject == null ? webpageObject : miniProgramObject);
-                        message.title = title;
-                        message.description = summary;
-                        message.thumbData = bytes;
-
-                        sendMessage(platform, message, buildTransaction("webPage"));
+                        handleshareWx(platform, title, targetUrl, summary, bytes, miniId, miniPath);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -124,6 +120,34 @@ public class WxShareInstance implements ShareInstance {
                 });
     }
 
+    private void handleshareWx(final int platform, final String title, final String targetUrl, final String summary,
+                               byte[] bytes, final String miniId, final String miniPath) {
+        WXMediaMessage message;
+        WXMiniProgramObject miniProgramObject = null;
+        WXWebpageObject webpageObject = null;
+
+        if (miniId != null && !"".equals(miniId) && miniPath != null && !"".equals(miniPath)) {
+            miniProgramObject = new WXMiniProgramObject();
+            // 低版本微信将打开网页分享
+            miniProgramObject.webpageUrl = targetUrl;
+            // 目标小程序的原始ID
+            miniProgramObject.userName = miniId;
+            // 小程序path
+            miniProgramObject.path = miniPath;
+        } else {
+            webpageObject = new WXWebpageObject();
+            webpageObject.webpageUrl = targetUrl;
+        }
+
+        message = new WXMediaMessage(miniProgramObject == null ? webpageObject : miniProgramObject);
+        message.title = title;
+        message.description = summary;
+        message.thumbData = bytes;
+
+        sendMessage(platform, message, buildTransaction("webPage"));
+    }
+
+    @SuppressLint("CheckResult")
     @Override
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
                            final Activity activity, final ShareListener listener) {
@@ -168,6 +192,7 @@ public class WxShareInstance implements ShareInstance {
                 });
     }
 
+    @SuppressLint("CheckResult")
     public void shareMiniProgram(
             final int platform, final String title, final String targetUrl, final String summary, final String miniId, final String miniPath,
             final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {

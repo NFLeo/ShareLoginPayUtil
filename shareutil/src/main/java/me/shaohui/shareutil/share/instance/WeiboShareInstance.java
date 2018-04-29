@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.share.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -65,6 +66,19 @@ public class WeiboShareInstance implements ShareInstance {
     }
 
     @Override
+    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener) {
+        String content = String.format("%s %s", title, targetUrl);
+
+        if (shareImmediate) {
+            if (shareImageObject.getPair() != null) {
+                shareTextOrImage(shareImageObject.getPair(), content, activity, listener);
+            }
+        } else {
+            shareTextOrImage(shareImageObject, content, activity, listener);
+        }
+    }
+
+    @Override
     public void shareImage(int platform, ShareImageObject shareImageObject, Activity activity,
                            ShareListener listener) {
         shareTextOrImage(shareImageObject, null, activity, listener);
@@ -100,6 +114,7 @@ public class WeiboShareInstance implements ShareInstance {
         mWeiboShareAPI = null;
     }
 
+    @SuppressLint("CheckResult")
     private void shareTextOrImage(final ShareImageObject shareImageObject, final String text,
                                   final Activity activity, final ShareListener listener) {
 
@@ -127,20 +142,7 @@ public class WeiboShareInstance implements ShareInstance {
                 .subscribe(new Consumer<Pair<String, byte[]>>() {
                     @Override
                     public void accept(@NonNull Pair<String, byte[]> stringPair) throws Exception {
-                        ImageObject imageObject = new ImageObject();
-                        imageObject.imageData = stringPair.second;
-                        imageObject.imagePath = stringPair.first;
-
-                        WeiboMultiMessage message = new WeiboMultiMessage();
-                        message.imageObject = imageObject;
-                        if (!TextUtils.isEmpty(text)) {
-                            TextObject textObject = new TextObject();
-                            textObject.text = text;
-
-                            message.textObject = textObject;
-                        }
-
-                        sendRequest(activity, message);
+                        handleShare(activity, stringPair, text);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -149,6 +151,60 @@ public class WeiboShareInstance implements ShareInstance {
                         listener.shareFailure(new Exception(throwable));
                     }
                 });
+    }
+
+    @SuppressLint("CheckResult")
+    private void shareTextOrImage(final Pair<String, byte[]> shareImageObject, final String text,
+                                  final Activity activity, final ShareListener listener) {
+
+        Flowable.create(new FlowableOnSubscribe<Pair<String, byte[]>>() {
+            @Override
+            public void subscribe(@NonNull FlowableEmitter<Pair<String, byte[]>> emitter) throws Exception {
+                try {
+                    emitter.onNext(shareImageObject);
+                    emitter.onComplete();
+                } catch (Exception e) {
+                    emitter.onError(e);
+                }
+            }
+        }, BackpressureStrategy.DROP)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnRequest(new LongConsumer() {
+                    @Override
+                    public void accept(long t) throws Exception {
+                        listener.shareRequest();
+                    }
+                })
+                .subscribe(new Consumer<Pair<String, byte[]>>() {
+                    @Override
+                    public void accept(@NonNull Pair<String, byte[]> stringPair) throws Exception {
+                        handleShare(activity, stringPair, text);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(@NonNull Throwable throwable) throws Exception {
+                        activity.finish();
+                        listener.shareFailure(new Exception(throwable));
+                    }
+                });
+    }
+
+    private void handleShare(Activity activity, Pair<String, byte[]> stringPair, String text) {
+        ImageObject imageObject = new ImageObject();
+        imageObject.imageData = stringPair.second;
+        imageObject.imagePath = stringPair.first;
+
+        WeiboMultiMessage message = new WeiboMultiMessage();
+        message.imageObject = imageObject;
+        if (!TextUtils.isEmpty(text)) {
+            TextObject textObject = new TextObject();
+            textObject.text = text;
+
+            message.textObject = textObject;
+        }
+
+        sendRequest(activity, message);
     }
 
     private void sendRequest(Activity activity, WeiboMultiMessage message) {

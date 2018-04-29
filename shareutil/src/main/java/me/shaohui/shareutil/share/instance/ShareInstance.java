@@ -18,6 +18,9 @@ public interface ShareInstance {
     void shareMedia(int platform, String title, String targetUrl, String summary, final String miniId, final String miniPath,
                     ShareImageObject shareImageObject, Activity activity, ShareListener listener);
 
+    void shareMedia(int platform, String title, String targetUrl, String summary, final String miniId, final String miniPath,
+                    ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener);
+
     void shareImage(int platform, ShareImageObject shareImageObject, Activity activity,
                     ShareListener listener);
 

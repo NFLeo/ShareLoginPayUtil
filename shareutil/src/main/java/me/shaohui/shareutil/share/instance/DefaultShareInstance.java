@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.share.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -39,23 +40,31 @@ public class DefaultShareInstance implements ShareInstance {
 
     @Override
     public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, Activity activity, ShareListener listener) {
+        handleShare(activity, title, targetUrl);
+    }
+
+    @Override
+    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener) {
+        handleShare(activity, title, targetUrl);
+    }
+
+    private void handleShare(Activity activity, String title, String targetUrl) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s %s", title, targetUrl));
         sendIntent.setType("text/plain");
-        activity.startActivity(Intent.createChooser(sendIntent,
-                activity.getResources().getString(R.string.vista_share_title)));
+        activity.startActivity(Intent.createChooser(sendIntent, activity.getResources().getString(R.string.vista_share_title)));
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void shareImage(int platform, final ShareImageObject shareImageObject,
-            final Activity activity, final ShareListener listener) {
+                           final Activity activity, final ShareListener listener) {
         Flowable.create(new FlowableOnSubscribe<Uri>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<Uri> emitter) throws Exception {
                 try {
-                    Uri uri =
-                            Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject)));
+                    Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject)));
                     emitter.onNext(uri);
                     emitter.onComplete();
                 } catch (Exception e) {
@@ -78,8 +87,7 @@ public class DefaultShareInstance implements ShareInstance {
                         shareIntent.setAction(Intent.ACTION_SEND);
                         shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
                         shareIntent.setType("image/jpeg");
-                        activity.startActivity(Intent.createChooser(shareIntent,
-                                activity.getResources().getText(R.string.vista_share_title)));
+                        activity.startActivity(Intent.createChooser(shareIntent, activity.getResources().getText(R.string.vista_share_title)));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -103,5 +111,6 @@ public class DefaultShareInstance implements ShareInstance {
     }
 
     @Override
-    public void recycle() { }
+    public void recycle() {
+    }
 }

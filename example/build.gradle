@@ -20,10 +20,6 @@ android {
         versionCode 1
         versionName "1.0"
 
-        manifestPlaceholders = [
-                qq_id: "XXXXXX"
-        ]
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
