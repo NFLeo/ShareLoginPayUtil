@@ -111,6 +111,42 @@
                 };
             LoginUtil.login(MainActivity.this, LoginPlatform.WEIBO, mLoginListener, isFetchUserInfo);
 
+### 支付使用
+
+        // PayPlatform.ALIPAY   支付宝支付
+        // PayPlatform.WXPAY    微信支付
+        PayListener mPayListener = new PayListener() {
+            @Override
+            public void paySuccess() {
+                Toast.makeText(v.getContext(), "支付成功", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void payFailed(Exception e) {
+                Toast.makeText(v.getContext(), "支付失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void payCancel() {
+                Toast.makeText(v.getContext(), "支付取消", Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        // 支付宝支付
+        AliPayParamsBean payParamsBean = new AliPayParamsBean();
+        payParamsBean.setOrderInfo("xxxx");
+        PayUtil.pay(getContext(), PayPlatform.ALIPAY, payParamsBean, mPayListener);
+
+        // 微信支付
+        WXPayParamsBean wxPayParamsBean = new WXPayParamsBean();
+        wxPayParamsBean.setAppid("xxxx");
+        wxPayParamsBean.setNonceStr("xxxx");
+        wxPayParamsBean.setPartnerid("xxxx");
+        wxPayParamsBean.setPackageValue("xxxx");
+        wxPayParamsBean.setPrepayId("xxxx");
+        wxPayParamsBean.setSign("xxxx");
+        wxPayParamsBean.setTimestamp("xxxx");
+        PayUtil.pay(getContext(), PayPlatform.WXPAY, wxPayParamsBean, mPayListener);
 
 ## 使用说明
 
