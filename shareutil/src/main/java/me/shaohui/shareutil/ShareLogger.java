@@ -39,7 +39,7 @@ public class ShareLogger {
 
         // for login
         public static final String LOGIN_SUCCESS = "call login success";
-        public static final String LOGIN_FAIl = "call login failed";
+        public static final String LOGIN_FAIL = "call login failed";
         public static final String LOGIN_CANCEL = "call login cancel";
         public static final String LOGIN_AUTH_SUCCESS = "call before fetch user info";
         public static final String ILLEGAL_TOKEN = "Illegal token, please check your config";
@@ -47,6 +47,11 @@ public class ShareLogger {
         public static final String QQ_AUTH_SUCCESS = "QQ auth success";
         public static final String WEIBO_AUTH_ERROR = "weibo auth error";
         public static final String UNKNOW_PLATFORM = "unknown platform";
+
+        // for pay
+        public static final String PAY_SUCCESS = "call pay success";
+        public static final String PAY_FAIL = "call pay failed";
+        public static final String PAY_CANCEL = "call pay cancel";
 
         public static final String WX_ERR_SENT_FAILED = "Wx sent failed";
         public static final String WX_ERR_UNSUPPORT = "Wx UnSupport";

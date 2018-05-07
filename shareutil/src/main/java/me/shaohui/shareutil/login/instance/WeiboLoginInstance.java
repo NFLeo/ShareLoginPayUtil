@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.login.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -90,6 +91,7 @@ public class WeiboLoginInstance extends LoginInstance {
         });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
         Flowable.create(new FlowableOnSubscribe<WeiboUser>() {

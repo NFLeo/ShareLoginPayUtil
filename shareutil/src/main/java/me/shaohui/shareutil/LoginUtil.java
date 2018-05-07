@@ -94,7 +94,7 @@ public class LoginUtil {
 
         @Override
         public void loginFailure(Exception e) {
-            ShareLogger.i(INFO.LOGIN_FAIl);
+            ShareLogger.i(INFO.LOGIN_FAIL);
             mListener.loginFailure(e);
             recycle();
         }

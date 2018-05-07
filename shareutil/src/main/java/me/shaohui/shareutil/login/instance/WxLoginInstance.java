@@ -1,5 +1,6 @@
 package me.shaohui.shareutil.login.instance;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -71,8 +72,8 @@ public class WxLoginInstance extends LoginInstance {
         mIWXAPI.sendReq(req);
     }
 
+    @SuppressLint("CheckResult")
     private void getToken(final String code) {
-
         Flowable.create(new FlowableOnSubscribe<WxToken>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<WxToken> wxTokenEmitter) throws Exception {
@@ -107,6 +108,7 @@ public class WxLoginInstance extends LoginInstance {
                 });
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
         Flowable.create(new FlowableOnSubscribe<WxUser>() {

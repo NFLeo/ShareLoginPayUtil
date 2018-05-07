@@ -216,27 +216,6 @@ public class ShareUtil {
         mShareInstance = null;
     }
 
-    /**
-     * 检查客户端是否安装
-     */
-
-    public static boolean isInstalled(@SharePlatform.Platform int platform, Context context) {
-        switch (platform) {
-            case SharePlatform.QQ:
-            case SharePlatform.QZONE:
-                return isQQInstalled(context);
-            case SharePlatform.WEIBO:
-                return isWeiBoInstalled(context);
-            case SharePlatform.WX:
-            case SharePlatform.WX_TIMELINE:
-                return isWeiXinInstalled(context);
-            case SharePlatform.DEFAULT:
-                return true;
-            default:
-                return false;
-        }
-    }
-
     @Deprecated
     public static boolean isQQInstalled(@NonNull Context context) {
         PackageManager pm = context.getPackageManager();

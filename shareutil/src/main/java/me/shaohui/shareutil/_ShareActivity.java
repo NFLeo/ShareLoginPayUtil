@@ -12,7 +12,6 @@ import static me.shaohui.shareutil.ShareLogger.INFO;
 /**
  * Created by shaohui on 2016/11/19.
  */
-
 public class _ShareActivity extends Activity {
 
     private int mType;
@@ -44,6 +43,8 @@ public class _ShareActivity extends Activity {
         } else if (mType == LoginUtil.TYPE) {
             // 登录
             LoginUtil.action(this);
+        } else if (mType == PayUtil.TYPE) {
+            PayUtil.action(this);
         } else {
             // handle 微信回调
             LoginUtil.handleResult(-1, -1, getIntent());
@@ -67,24 +68,24 @@ public class _ShareActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         ShareLogger.i(INFO.ACTIVITY_NEW_INTENT);
-        // 处理回调
-        if (mType == LoginUtil.TYPE) {
-            LoginUtil.handleResult(0, 0, intent);
-        } else if (mType == ShareUtil.TYPE) {
-            ShareUtil.handleResult(intent);
-        }
-        finish();
+        handleCallBack(0, 0, intent);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         ShareLogger.i(INFO.ACTIVITY_RESULT);
-        // 处理回调
+        handleCallBack(requestCode, resultCode, data);
+    }
+
+    // 处理回调
+    private void handleCallBack(int requestCode, int resultCode, Intent data) {
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(requestCode, resultCode, data);
         } else if (mType == ShareUtil.TYPE) {
             ShareUtil.handleResult(data);
+        } else if (mType == PayUtil.TYPE) {
+            PayUtil.handleResult(data);
         }
         finish();
     }

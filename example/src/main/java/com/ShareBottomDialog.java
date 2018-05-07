@@ -1,9 +1,8 @@
-package com.younglive.livestreaming;
+package com;
 
 import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.Toast;
-
 import me.shaohui.bottomdialog.BaseBottomDialog;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ShareListener;
