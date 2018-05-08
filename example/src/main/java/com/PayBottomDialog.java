@@ -8,6 +8,8 @@ import me.shaohui.shareutil.PayUtil;
 import me.shaohui.shareutil.pay.AliPayParamsBean;
 import me.shaohui.shareutil.pay.PayListener;
 import me.shaohui.shareutil.pay.PayPlatform;
+import me.shaohui.shareutil.pay.UnionPayParamsBean;
+import me.shaohui.shareutil.pay.UnionPayPlatform;
 import me.shaohui.shareutil.pay.WXPayParamsBean;
 
 public class PayBottomDialog extends BaseBottomDialog implements View.OnClickListener {
@@ -64,7 +66,10 @@ public class PayBottomDialog extends BaseBottomDialog implements View.OnClickLis
                 PayUtil.pay(getContext(), PayPlatform.WXPAY, wxPayParamsBean, mPayListener);
                 break;
             case R.id.share_union:
-                Toast.makeText(getContext(), "敬请期待", Toast.LENGTH_SHORT).show();
+                UnionPayParamsBean unionPayParamsBean = new UnionPayParamsBean();
+                unionPayParamsBean.setTn("xxxxxx");
+                unionPayParamsBean.setMode(UnionPayPlatform.RELEASE);
+                PayUtil.pay(getContext(), PayPlatform.UNIONPAY, unionPayParamsBean, mPayListener);
                 break;
         }
         dismiss();

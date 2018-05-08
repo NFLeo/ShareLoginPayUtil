@@ -11,6 +11,11 @@ android {
         manifestPlaceholders = [
                 qq_id: "XXXXXX"
         ]
+
+        ndk {
+            //选择要添加的对应cpu类型的.so库。
+            abiFilters 'armeabi'
+        }
     }
     buildTypes {
         release {
@@ -32,4 +37,6 @@ dependencies {
     // QQ
     compile files('libs/open_sdk_r5923_lite.jar')
     implementation files('libs/alipaySdk-20180403.jar')
+    implementation files('libs/UPPayAssistEx.jar')
+    implementation files('libs/UPPayPluginExPro.jar')
 }

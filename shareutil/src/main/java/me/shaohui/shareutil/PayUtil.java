@@ -9,7 +9,8 @@ import me.shaohui.shareutil.pay.PayListener;
 import me.shaohui.shareutil.pay.PayPlatform;
 import me.shaohui.shareutil.pay.instance.AliPayInstance;
 import me.shaohui.shareutil.pay.instance.PayInstance;
-import me.shaohui.shareutil.pay.instance.WeXinInstance;
+import me.shaohui.shareutil.pay.instance.UnionPayInstance;
+import me.shaohui.shareutil.pay.instance.WXPayInstance;
 
 import static me.shaohui.shareutil.ShareLogger.INFO;
 
@@ -44,11 +45,11 @@ public class PayUtil {
                 mPayInstance = new AliPayInstance();
                 break;
             case PayPlatform.WXPAY:
-                mPayInstance = new WeXinInstance(activity);
+                mPayInstance = new WXPayInstance(activity);
                 break;
-//            case PayPlatform.UNIONPAY:
-//                mPayInstance = new WeXinInstance(activity);
-//                break;
+            case PayPlatform.UNIONPAY:
+                mPayInstance = new UnionPayInstance();
+                break;
             default:
                 mPayListener.payFailed(new Exception(INFO.UNKNOW_PLATFORM));
                 activity.finish();

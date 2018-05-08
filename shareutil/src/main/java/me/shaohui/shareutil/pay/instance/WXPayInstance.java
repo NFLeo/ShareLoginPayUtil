@@ -21,13 +21,13 @@ import me.shaohui.shareutil.pay.WXPayParamsBean;
  * Describe : 微信支付
  * Created by Leo on 2018/5/7 on 16:04.
  */
-public class WeXinInstance implements PayInstance<WXPayParamsBean> {
+public class WXPayInstance implements PayInstance<WXPayParamsBean> {
 
     private IWXAPI mIWXAPI;
     private WXPayParamsBean payParams;
     private PayListener payCallback;
 
-    public WeXinInstance(Activity activity) {
+    public WXPayInstance(Activity activity) {
         mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());
     }
 

@@ -1,6 +1,6 @@
 package me.shaohui.shareutil.pay;
 
-import android.support.annotation.IntDef;
+import android.support.annotation.StringDef;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -8,21 +8,20 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-/**
- * Created by shaohui on 2016/12/1.
- */
-
-public class PayPlatform {
+ /**
+  * Describe : 银联支付类型枚举
+  * Created by Leo on 2018/5/8.
+  */
+public class UnionPayPlatform {
 
     @Documented
-    @IntDef({ALIPAY, WXPAY, UNIONPAY})
+    @StringDef({RELEASE, DEV})
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.PARAMETER)
     public @interface Platform { }
 
-    public static final int ALIPAY = 1;
-
-    public static final int WXPAY = 2;
-
-    public static final int UNIONPAY = 3;
+    // 正式
+    public static final String RELEASE = "00";
+    // 测试
+    public static final String DEV = "01";
 }
