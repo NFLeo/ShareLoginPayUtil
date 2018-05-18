@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.Toast;
 import me.shaohui.bottomdialog.BaseBottomDialog;
+import me.shaohui.shareutil.ShareManager;
 import me.shaohui.shareutil.ShareUtil;
 import me.shaohui.shareutil.share.ShareListener;
 import me.shaohui.shareutil.share.SharePlatform;
@@ -29,6 +30,7 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
         v.findViewById(R.id.share_wx).setOnClickListener(this);
         v.findViewById(R.id.share_wx_mini).setOnClickListener(this);
         v.findViewById(R.id.share_wx_timeline).setOnClickListener(this);
+        v.findViewById(R.id.share_system).setOnClickListener(this);
 
         mShareListener = new ShareListener() {
             @Override
@@ -76,6 +78,10 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
             case R.id.share_wx_mini:
                 ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", BitmapFactory.decodeResource(getResources(),
                         R.mipmap.ic_launcher), "gh_41bb43658d5e", "share/card/card", mShareListener);
+                break;
+            case R.id.share_system:
+                ShareUtil.shareText(getContext(), SharePlatform.DEFAULT, "测试分享文字",
+                        mShareListener);
                 break;
         }
         dismiss();

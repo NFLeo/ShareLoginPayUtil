@@ -2,12 +2,19 @@ package me.shaohui.shareutil.share.instance;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Parcelable;
+import android.util.Log;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
@@ -34,8 +41,7 @@ public class DefaultShareInstance implements ShareInstance {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, text);
         sendIntent.setType("text/plain");
-        activity.startActivity(Intent.createChooser(sendIntent,
-                activity.getResources().getString(R.string.vista_share_title)));
+        activity.startActivity(Intent.createChooser(sendIntent, activity.getResources().getString(R.string.vista_share_title)));
     }
 
     @Override
@@ -104,10 +110,7 @@ public class DefaultShareInstance implements ShareInstance {
 
     @Override
     public boolean isInstall(Context context) {
-        Intent shareIntent = new Intent();
-        shareIntent.setAction(Intent.ACTION_SEND);
-        return context.getPackageManager()
-                .resolveActivity(shareIntent, PackageManager.MATCH_DEFAULT_ONLY) != null;
+        return true;
     }
 
     @Override

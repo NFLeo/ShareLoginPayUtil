@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
+import com.R;
 import com.ShareBottomDialog;
 
 import me.shaohui.shareutil.ShareConfig;
