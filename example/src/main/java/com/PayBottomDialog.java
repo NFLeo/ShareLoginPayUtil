@@ -3,14 +3,13 @@ package com;
 import android.view.View;
 import android.widget.Toast;
 
+import com.shareutil.PayUtil;
+import com.shareutil.pay.AliPayParamsBean;
+import com.shareutil.pay.PayListener;
+import com.shareutil.pay.PayPlatform;
+import com.shareutil.pay.WXPayParamsBean;
+
 import me.shaohui.bottomdialog.BaseBottomDialog;
-import me.shaohui.shareutil.PayUtil;
-import me.shaohui.shareutil.pay.AliPayParamsBean;
-import me.shaohui.shareutil.pay.PayListener;
-import me.shaohui.shareutil.pay.PayPlatform;
-import me.shaohui.shareutil.pay.UnionPayParamsBean;
-import me.shaohui.shareutil.pay.UnionPayPlatform;
-import me.shaohui.shareutil.pay.WXPayParamsBean;
 
 public class PayBottomDialog extends BaseBottomDialog implements View.OnClickListener {
 
@@ -24,7 +23,6 @@ public class PayBottomDialog extends BaseBottomDialog implements View.OnClickLis
     @Override
     public void bindView(final View v) {
         v.findViewById(R.id.share_alipay).setOnClickListener(this);
-        v.findViewById(R.id.share_union).setOnClickListener(this);
         v.findViewById(R.id.share_wx).setOnClickListener(this);
 
         mPayListener = new PayListener() {
@@ -64,12 +62,6 @@ public class PayBottomDialog extends BaseBottomDialog implements View.OnClickLis
                 wxPayParamsBean.setTimestamp("xxxx");
 
                 PayUtil.pay(getContext(), PayPlatform.WXPAY, wxPayParamsBean, mPayListener);
-                break;
-            case R.id.share_union:
-                UnionPayParamsBean unionPayParamsBean = new UnionPayParamsBean();
-                unionPayParamsBean.setTn("xxxxxx");
-                unionPayParamsBean.setMode(UnionPayPlatform.RELEASE);
-                PayUtil.pay(getContext(), PayPlatform.UNIONPAY, unionPayParamsBean, mPayListener);
                 break;
         }
         dismiss();

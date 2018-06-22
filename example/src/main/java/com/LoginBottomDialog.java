@@ -3,10 +3,10 @@ package com;
 import android.view.View;
 import android.widget.Toast;
 import me.shaohui.bottomdialog.BaseBottomDialog;
-import me.shaohui.shareutil.LoginUtil;
-import me.shaohui.shareutil.login.LoginListener;
-import me.shaohui.shareutil.login.LoginPlatform;
-import me.shaohui.shareutil.login.LoginResult;
+import com.shareutil.LoginUtil;
+import com.shareutil.login.LoginListener;
+import com.shareutil.login.LoginPlatform;
+import com.shareutil.login.LoginResult;
 
 public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickListener {
 

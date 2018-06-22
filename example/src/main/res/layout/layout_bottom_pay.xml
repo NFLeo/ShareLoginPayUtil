@@ -70,30 +70,6 @@
                     android:textSize="13sp" />
             </RelativeLayout>
 
-            <RelativeLayout
-                android:id="@+id/mRlQQ"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
-
-                <ImageView
-                    android:id="@+id/share_union"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_centerHorizontal="true"
-                    android:src="@mipmap/ic_launcher" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_marginBottom="17dp"
-                    android:gravity="center"
-                    android:text="银联"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="13sp" />
-            </RelativeLayout>
-
         </LinearLayout>
 
     </RelativeLayout>

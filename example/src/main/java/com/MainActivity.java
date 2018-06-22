@@ -5,8 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import me.shaohui.shareutil.ShareConfig;
-import me.shaohui.shareutil.ShareManager;
+import com.shareutil.ShareConfig;
+import com.shareutil.ShareManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -23,8 +23,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         findViewBy();
         setListener();
-        ShareConfig config = ShareConfig.instance().qqId("12345678")
-                .weiboScope("XXX").weiboRedirectUrl("XXXX")
+        ShareConfig config = ShareConfig.instance().qqId("1106618327")
+                .weiboId("1712559958")
                 .wxId(APP_ID).wxSecret(APP_SECRET);
         ShareManager.init(config);
     }

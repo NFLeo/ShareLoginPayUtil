@@ -3,15 +3,12 @@ package com;
 import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.Toast;
-import me.shaohui.bottomdialog.BaseBottomDialog;
-import me.shaohui.shareutil.ShareManager;
-import me.shaohui.shareutil.ShareUtil;
-import me.shaohui.shareutil.share.ShareListener;
-import me.shaohui.shareutil.share.SharePlatform;
 
-/**
- * Created by shaohui on 2016/12/10.
- */
+import com.shareutil.ShareUtil;
+import com.shareutil.share.ShareListener;
+import com.shareutil.share.SharePlatform;
+
+import me.shaohui.bottomdialog.BaseBottomDialog;
 
 public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickListener {
 
@@ -56,32 +53,29 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
         switch (view.getId()) {
             case R.id.share_qq:
                 ShareUtil.shareImage(getContext(), SharePlatform.QQ,
-                        "http://shaohui.me/images/avatar.gif", mShareListener);
+                        "http://android-screenimgs.25pp.com/fs08/2018/05/11/4/110_f77a9c519c81005292e24f6eb324ea3b_234x360.jpg", mShareListener);
                 break;
             case R.id.share_qzone:
                 ShareUtil.shareMedia(getContext(), SharePlatform.QZONE, "Title", "summary",
-                        "http://www.google.com", "http://shaohui.me/images/avatar.gif",
+                        "https://www.baidu.com", "http://android-screenimgs.25pp.com/fs08/2018/05/11/4/110_f77a9c519c81005292e24f6eb324ea3b_234x360.jpg",
                         mShareListener);
                 break;
             case R.id.share_weibo:
-                ShareUtil.shareImage(getContext(), SharePlatform.WEIBO,
-                        "http://shaohui.me/images/avatar.gif", mShareListener);
+                ShareUtil.shareText(getContext(), SharePlatform.WEIBO, "测试微博分享文字", mShareListener);
                 break;
             case R.id.share_wx_timeline:
-                ShareUtil.shareText(getContext(), SharePlatform.WX_TIMELINE, "测试分享文字",
-                        mShareListener);
+                ShareUtil.shareImage(getContext(), SharePlatform.WX_TIMELINE,
+                        "http://android-screenimgs.25pp.com/fs08/2018/05/11/4/110_f77a9c519c81005292e24f6eb324ea3b_234x360.jpg", mShareListener);
                 break;
             case R.id.share_wx:
-                ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", BitmapFactory.decodeResource(getResources(),
-                        R.mipmap.ic_launcher), mShareListener);
+                ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", R.mipmap.ic_launcher, mShareListener);
                 break;
             case R.id.share_wx_mini:
                 ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", BitmapFactory.decodeResource(getResources(),
                         R.mipmap.ic_launcher), "gh_41bb43658d5e", "share/card/card", mShareListener);
                 break;
             case R.id.share_system:
-                ShareUtil.shareText(getContext(), SharePlatform.DEFAULT, "测试分享文字",
-                        mShareListener);
+                ShareUtil.shareMedia(getContext(), SharePlatform.DEFAULT, "标题", "内容", "http://www.baidu.com", R.mipmap.ic_launcher, mShareListener);
                 break;
         }
         dismiss();
