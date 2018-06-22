@@ -40,7 +40,6 @@ public class WxShareInstance implements ShareInstance {
     /**
      * 微信分享限制thumb image必须小于32Kb，否则点击分享会没有反应
      */
-
     private IWXAPI mIWXAPI;
 
     private static final int THUMB_SIZE = 32 * 1024 * 8;
@@ -86,7 +85,7 @@ public class WxShareInstance implements ShareInstance {
 
         Flowable.create(new FlowableOnSubscribe<byte[]>() {
             @Override
-            public void subscribe(@NonNull FlowableEmitter<byte[]> emitter) throws Exception {
+            public void subscribe(@NonNull FlowableEmitter<byte[]> emitter) {
                 try {
                     String imagePath = ImageDecoder.decode(activity, shareImageObject);
                     emitter.onNext(ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE));
@@ -99,18 +98,18 @@ public class WxShareInstance implements ShareInstance {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnRequest(new LongConsumer() {
                     @Override
-                    public void accept(long t) throws Exception {
+                    public void accept(long t) {
                         listener.shareRequest();
                     }
                 })
                 .subscribe(new Consumer<byte[]>() {
                     @Override
-                    public void accept(@NonNull byte[] bytes) throws Exception {
+                    public void accept(@NonNull byte[] bytes) {
                         handleshareWx(platform, title, targetUrl, summary, bytes, miniId, miniPath);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
+                    public void accept(@NonNull Throwable throwable) {
                         activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
@@ -151,7 +150,7 @@ public class WxShareInstance implements ShareInstance {
 
         Flowable.create(new FlowableOnSubscribe<Pair<Bitmap, byte[]>>() {
             @Override
-            public void subscribe(@NonNull FlowableEmitter<Pair<Bitmap, byte[]>> emitter) throws Exception {
+            public void subscribe(@NonNull FlowableEmitter<Pair<Bitmap, byte[]>> emitter) {
                 try {
                     String imagePath = ImageDecoder.decode(activity, shareImageObject);
                     emitter.onNext(Pair.create(BitmapFactory.decodeFile(imagePath),
@@ -165,13 +164,13 @@ public class WxShareInstance implements ShareInstance {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnRequest(new LongConsumer() {
                     @Override
-                    public void accept(long t) throws Exception {
+                    public void accept(long t) {
                         listener.shareRequest();
                     }
                 })
                 .subscribe(new Consumer<Pair<Bitmap, byte[]>>() {
                     @Override
-                    public void accept(@NonNull Pair<Bitmap, byte[]> pair) throws Exception {
+                    public void accept(@NonNull Pair<Bitmap, byte[]> pair) {
                         WXImageObject imageObject = new WXImageObject(pair.first);
 
                         WXMediaMessage message = new WXMediaMessage();
@@ -182,71 +181,19 @@ public class WxShareInstance implements ShareInstance {
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
+                    public void accept(@NonNull Throwable throwable) {
                         activity.finish();
                         listener.shareFailure(new Exception(throwable));
                     }
                 });
-    }
-
-    @SuppressLint("CheckResult")
-    public void shareMiniProgram(
-            final int platform, final String title, final String targetUrl, final String summary, final String miniId, final String miniPath,
-            final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
-
-        Flowable.create(new FlowableOnSubscribe<byte[]>() {
-            @Override
-            public void subscribe(@NonNull FlowableEmitter<byte[]> emitter) throws Exception {
-                try {
-                    String imagePath = ImageDecoder.decode(activity, shareImageObject);
-                    emitter.onNext(ImageDecoder.compress2Byte(imagePath, TARGET_SIZE, THUMB_SIZE));
-                } catch (Exception e) {
-                    emitter.onError(e);
-                }
-            }
-        }, BackpressureStrategy.DROP)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
-                .subscribe(new Consumer<byte[]>() {
-                    @Override
-                    public void accept(@NonNull byte[] bytes) throws Exception {
-
-                        WXMiniProgramObject miniProgramObject = new WXMiniProgramObject();
-                        // 低版本微信将打开网页分享
-                        miniProgramObject.webpageUrl = targetUrl;
-                        // 目标小程序的原始ID
-                        miniProgramObject.userName = miniId;
-                        // 小程序path
-                        miniProgramObject.path = miniPath;
-
-                        WXMediaMessage message = new WXMediaMessage(miniProgramObject);
-                        message.title = title;
-                        message.description = summary;
-                        message.thumbData = bytes;
-
-                        sendMessage(platform, message, buildTransaction("webPage"));
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        activity.finish();
-                        listener.shareFailure(new Exception(throwable));
-                    }
-                });
-
     }
 
     @Override
     public void handleResult(Intent data) {
         mIWXAPI.handleIntent(data, new IWXAPIEventHandler() {
             @Override
-            public void onReq(BaseReq baseReq) { }
+            public void onReq(BaseReq baseReq) {
+            }
 
             @Override
             public void onResp(BaseResp baseResp) {

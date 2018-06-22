@@ -25,32 +25,38 @@ import io.reactivex.schedulers.Schedulers;
 
 public class DefaultShareInstance implements ShareInstance {
 
+    private static final int SHARE_TYPE_TEXT = 0x11111;
+    private static final int SHARE_TYPE_IMAGE = 0x11112;
+
     @Override
     public void shareText(int platform, String text, Activity activity, ShareListener listener) {
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, text);
-        sendIntent.setType("text/plain");
-        activity.startActivity(Intent.createChooser(sendIntent, activity.getResources().getString(R.string.vista_share_title)));
+        handleShare(activity, SHARE_TYPE_TEXT, "", "", text, null);
+
     }
 
     @Override
-    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, Activity activity, ShareListener listener) {
-        handleShare(activity, title, targetUrl, summary);
+    public void shareMedia(int platform, final String title, final String targetUrl, final String summary, String miniId, String miniPath, ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
+        createImageShare(title, targetUrl, summary, shareImageObject, activity, listener);
     }
 
     @Override
     public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener) {
-        handleShare(activity, title, targetUrl, summary);
+        createImageShare(title, targetUrl, summary, shareImageObject, activity, listener);
     }
 
-    private void handleShare(Activity activity, String title, String targetUrl, String summary) {
+    private void handleShare(Activity activity, int type, String title, String targetUrl, String summary, Uri imageUri) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, title);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, summary);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s %s", title, targetUrl));
-        sendIntent.setType("text/plain");
+        sendIntent.putExtra(Intent.EXTRA_TEXT, String.format("%s %s", summary, targetUrl));
+
+        if (type == SHARE_TYPE_IMAGE && imageUri != null) {
+            sendIntent.putExtra(Intent.EXTRA_STREAM, imageUri);
+            sendIntent.setType("image/*");
+        } else {
+            sendIntent.setType("text/plain");
+        }
+
         activity.startActivity(Intent.createChooser(sendIntent, activity.getResources().getString(R.string.vista_share_title)));
     }
 
@@ -58,9 +64,15 @@ public class DefaultShareInstance implements ShareInstance {
     @Override
     public void shareImage(int platform, final ShareImageObject shareImageObject,
                            final Activity activity, final ShareListener listener) {
+        createImageShare("", "", "", shareImageObject, activity, listener);
+    }
+
+    @SuppressLint("CheckResult")
+    private void createImageShare(final String title, final String targetUrl, final String summary, final ShareImageObject shareImageObject,
+                                  final Activity activity, final ShareListener listener) {
         Flowable.create(new FlowableOnSubscribe<Uri>() {
             @Override
-            public void subscribe(@NonNull FlowableEmitter<Uri> emitter) throws Exception {
+            public void subscribe(@NonNull FlowableEmitter<Uri> emitter) {
                 try {
                     Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject)));
                     emitter.onNext(uri);
@@ -74,44 +86,21 @@ public class DefaultShareInstance implements ShareInstance {
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnRequest(new LongConsumer() {
                     @Override
-                    public void accept(long t) throws Exception {
+                    public void accept(long t) {
                         listener.shareRequest();
                     }
                 })
                 .subscribe(new Consumer<Uri>() {
                     @Override
-                    public void accept(@NonNull Uri uri) throws Exception {
-                        Intent shareIntent = new Intent();
-                        shareIntent.setAction(Intent.ACTION_SEND);
-                        shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-                        shareIntent.setType("image/jpeg");
-                        activity.startActivity(Intent.createChooser(shareIntent, activity.getResources().getText(R.string.vista_share_title)));
+                    public void accept(@NonNull Uri uri) {
+                        handleShare(activity, SHARE_TYPE_IMAGE, title, targetUrl, summary, uri);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
+                    public void accept(@NonNull Throwable throwable) {
                         listener.shareFailure(new Exception(throwable));
                     }
                 });
-    }
-
-    public void shareMsg(String activityTitle, String msgTitle, String msgText,
-                         String imgPath) {
-        Intent intent = new Intent(Intent.ACTION_SEND);
-        if (imgPath == null || imgPath.equals("")) {
-            intent.setType("text/plain"); // 纯文本
-        } else {
-            File f = new File(imgPath);
-            if (f != null && f.exists() && f.isFile()) {
-                intent.setType("image/jpg");
-                Uri u = Uri.fromFile(f);
-                intent.putExtra(Intent.EXTRA_STREAM, u);
-            }
-        }
-        intent.putExtra(Intent.EXTRA_SUBJECT, msgTitle);
-        intent.putExtra(Intent.EXTRA_TEXT, msgText);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        startActivity(Intent.createChooser(intent, activityTitle));
     }
 
     @Override
