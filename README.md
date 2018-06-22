@@ -51,13 +51,14 @@
 
 2. 主项目AnidroidManifest添加以下代码：
 ```
-        <activity android:name="me.shaohui.shareutil._ShareActivity"/>
+        <activity
+                theme:"@style/transition"
+                android:name="com.shareutil._ShareActivity"/>
 
         <activity-alias
                 android:name=".wxapi.WXEntryActivity"
                 android:exported="true"
-                android:targetActivity="me.shaohui.shareutil._ShareActivity"
-                />
+                android:targetActivity="com.shareutil._ShareActivity" />
 ```
 3. build.gradle 配置
 在defaultConfig节点下增加你的qq id信息
