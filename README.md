@@ -6,6 +6,7 @@
     3. 部分代码优化
     4. 添加微信、支付宝支付，避免主目录添加wx文件夹方式
     5. 同步更新微博官方分享支付（2018-6-22）
+    6. 支持网络依赖
 ```
 ## TODO
 - 支持多图分享
@@ -49,6 +50,30 @@
 
 ### 使用配置
 
+####支持两种依赖方式
+A. 网络依赖：
+1. 项目主module中 build.gradle 添加如下代码
+```
+    compile 'com.nfleo:ShareLoginPayUtil:1.0.0'
+```
+2. 项目build.gradle 中添加如下代码
+```
+    buildscript {
+        repositories {
+            jcenter()
+            maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+        }
+    }
+
+    allprojects {
+        repositories {
+            jcenter()
+            maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+        }
+    }
+```
+
+B. 完整代码依赖：
 1. 直接依赖shareutil项目
 
 2. 主项目AnidroidManifest添加以下代码：
