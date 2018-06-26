@@ -50,11 +50,10 @@
 
 ### 使用配置
 
-####支持两种依赖方式
-A. 网络依赖：
+#### 使用方式
 1. 项目主module中 build.gradle 添加如下代码
 ```
-    compile 'com.nfleo:ShareLoginPayUtil:1.0.0'
+    compile 'com.nfleo:ShareLoginPayUtil:1.0.1'
 ```
 2. 项目build.gradle 中添加如下代码
 ```
@@ -73,35 +72,7 @@ A. 网络依赖：
     }
 ```
 
-B. 完整代码依赖：
-1. 直接依赖shareutil项目
-
-2. 主项目AnidroidManifest添加以下代码：
-```
-        <activity
-                theme:"@style/transition"
-                android:name="com.shareutil._ShareActivity"/>
-
-        <activity-alias
-                android:name=".wxapi.WXEntryActivity"
-                android:exported="true"
-                android:targetActivity="com.shareutil._ShareActivity" />
-```
-3. build.gradle 配置
-在defaultConfig节点下增加你的qq id信息
-
-项目会提示manifest缺少qq_id ，可忽略
-
-        defaultConfig {
-        	...
-        	
-            manifestPlaceholders = [
-                    //  替换成你的qq_id
-                    qq_id: "123456789"
-            ]
-            
-        }
-4. 在使用之前设置在各个平台申请的Id，以及分享的回调（推荐放在Application的onCreate方法中）
+3. 在使用之前设置在各个平台申请的Id，以及分享的回调（推荐放在Application的onCreate方法中）
     
             // init
             ShareConfig config = ShareConfig.instance()
@@ -188,9 +159,10 @@ B. 完整代码依赖：
 1. QQ不支持纯文字分享，会直接分享失败
 2. 使用Jar文件的版本如下：
 
-        微信版本：com.tencent.mm.opensdk:wechat-sdk-android-without-mta:1.4.0
+        微信版本：com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.1.4
         QQ版本：libs/open_sdk_r5923_lite.jar
-        微博版本: libs/weiboSDKCore_3.1.4.jar
+        微博版本: com.sina.weibo.sdk:core:4.1.0:openDefaultRelease@aar
+        支付宝版本： 'libs/alipaySdk-20180403.jar'
 3. 分享的bitmap，会在分享之后被回收掉，所以分享之后最好不要再对该bitmap做任何操作。
 4. example 中的代码可以参考，但是不可运行，因为需要保证包名以及签名文件和你申请各个平台id所填写信息保持一致
 5. ShareListener的回调结果仅供参考，不可当做分享是否返回的依据，它并不是那么完全可靠，因为某些操作，例如微博分享取消，但是用户选择了保存草稿，这时候客户端并不会收到回调，所以也就不会调用ShareListener的onCancel

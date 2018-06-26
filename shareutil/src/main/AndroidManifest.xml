@@ -31,21 +31,16 @@
         </activity>
 
         <activity
-            android:name="me.shaohui.shareutil.com.shaohui.shareutil._ShareActivity"
+            android:name="com.shareutil._ShareActivity"
             android:launchMode="singleTask"
             android:taskAffinity="me.shaohui.shareutil"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar">
-            <intent-filter>
-                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+            android:theme="@style/translucent"/>
 
         <!--wxpay start-->
         <activity-alias
             android:name="${applicationId}.wxapi.WXEntryActivity"
             android:exported="true"
-            android:targetActivity="me.shaohui.shareutil.com.shaohui.shareutil._ShareActivity" />
+            android:targetActivity="com.shareutil._ShareActivity" />
         <!--wxpay end-->
 
         <!--alipay start-->
@@ -60,21 +55,6 @@
             android:exported="false"
             android:screenOrientation="behind" />
         <!--alipay end-->
-
-        <!--unionpay start-->
-        <activity
-            android:name="com.unionpay.uppay.PayActivity"
-            android:configChanges="orientation|keyboardHidden|keyboard"
-            android:excludeFromRecents="true"
-            android:label="@string/app_name"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name="com.unionpay.UPPayWapActivity"
-            android:configChanges="orientation|keyboardHidden|fontScale"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="adjustResize" />
-        <!-- unionpay end -->
 
     </application>
 

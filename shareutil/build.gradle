@@ -1,4 +1,14 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
+publish {
+    repoName = 'ShareLoginPayUtil'
+    userOrg = 'nfleo'//bintray.com用户名
+    groupId = 'com.nfleo'//jcenter上的路径
+    artifactId = 'ShareLoginPayUtil'//项目名称
+    publishVersion = '1.0.1'//版本号
+    desc = 'this is for test'
+    website = 'https://github.com/NFLeo/ShareUtil'
+}
 
 android {
     compileSdkVersion 26
@@ -23,6 +33,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -36,5 +50,9 @@ dependencies {
     compile 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.1.4'
     // QQ
     compile files('libs/open_sdk_r5923_lite.jar')
-    implementation files('libs/alipaySdk-20180403.jar')
+    compile files('libs/alipaySdk-20180403.jar')
+}
+
+tasks.withType(JavaCompile){
+    options.encoding = "UTF-8"
 }
