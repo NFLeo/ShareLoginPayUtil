@@ -194,13 +194,6 @@ public class WeiboShareInstance implements ShareInstance {
             message.imageObject = getImageObj(stringPair);
         }
 
-//        if (multiImageCheckbox.isChecked()) {
-//            weiboMessage.multiImageObject = getMultiImageObject();
-//        }
-//        if (videoCheckbox.isChecked()) {
-//            weiboMessage.videoSourceObject = getVideoObject();
-//        }
-
         shareHandler.shareMessage(message, false);
     }
 

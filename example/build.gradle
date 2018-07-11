@@ -24,8 +24,8 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false          //打开混淆
-            shrinkResources false        //打开资源压缩
+            minifyEnabled true          //打开混淆
+            shrinkResources true        //打开资源压缩
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
@@ -51,6 +51,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
-tasks.withType(JavaCompile){
+tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }
