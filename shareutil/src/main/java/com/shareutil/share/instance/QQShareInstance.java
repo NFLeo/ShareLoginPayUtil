@@ -14,6 +14,7 @@ import com.shareutil.ShareUtil;
 import com.shareutil.share.ImageDecoder;
 import com.shareutil.share.ShareImageObject;
 import com.shareutil.share.ShareListener;
+import com.shareutil.share.SharePlatform;
 import com.tencent.connect.share.QQShare;
 import com.tencent.connect.share.QzonePublish;
 import com.tencent.connect.share.QzoneShare;
@@ -32,8 +33,6 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
 
-import com.shareutil.share.SharePlatform;
-
 public class QQShareInstance implements ShareInstance {
 
     private Tencent mTencent;
@@ -47,8 +46,8 @@ public class QQShareInstance implements ShareInstance {
         if (platform == SharePlatform.QZONE) {
             shareToQZoneForText(text, activity, listener);
         } else {
-            activity.finish();
             listener.shareFailure(new Exception(ShareLogger.INFO.QQ_NOT_SUPPORT_SHARE_TXT));
+            activity.finish();
         }
     }
 
@@ -153,8 +152,8 @@ public class QQShareInstance implements ShareInstance {
     }
 
     @Override
-    public void handleResult(Intent data) {
-        Tencent.handleResultData(data, ShareUtil.mShareListener);
+    public void handleResult(int requestCode, int resultCode, Intent data) {
+        Tencent.onActivityResultData(requestCode, resultCode, data, ShareUtil.mShareListener);
     }
 
     @Override

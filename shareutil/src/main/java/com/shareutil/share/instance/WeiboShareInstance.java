@@ -79,7 +79,7 @@ public class WeiboShareInstance implements ShareInstance {
     }
 
     @Override
-    public void handleResult(Intent intent) {
+    public void handleResult(int requestCode, int resultCode, Intent intent) {
         shareHandler.doResultIntent(intent, new WbShareCallback() {
             @Override
             public void onWbShareSuccess() {

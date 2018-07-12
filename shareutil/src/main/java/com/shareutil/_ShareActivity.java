@@ -14,13 +14,18 @@ public class _ShareActivity extends Activity {
 
     private static final String TYPE = "share_activity_type";
 
-    public static Intent newInstance(Context context, int type) {
+    public static void newInstance(Context context, int type) {
+        if (context == null) {
+            return;
+        }
+
         Intent intent = new Intent(context, _ShareActivity.class);
         if (context instanceof Application) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         intent.putExtra(TYPE, type);
-        return intent;
+        context.startActivity(intent);
+        ((Activity) context).overridePendingTransition(0, 0);
     }
 
     @Override
@@ -42,7 +47,7 @@ public class _ShareActivity extends Activity {
         } else {
             // handle 微信回调
             LoginUtil.handleResult(-1, -1, getIntent());
-            ShareUtil.handleResult(getIntent());
+            ShareUtil.handleResult(-1, -1, getIntent());
             finish();
         }
     }
@@ -56,6 +61,12 @@ public class _ShareActivity extends Activity {
         } else {
             finish();
         }
+    }
+
+    @Override
+    public void finish() {
+        super.finish();
+        overridePendingTransition(0, 0);
     }
 
     @Override
@@ -77,7 +88,7 @@ public class _ShareActivity extends Activity {
         if (mType == LoginUtil.TYPE) {
             LoginUtil.handleResult(requestCode, resultCode, data);
         } else if (mType == ShareUtil.TYPE) {
-            ShareUtil.handleResult(data);
+            ShareUtil.handleResult(requestCode, resultCode, data);
         } else if (mType == PayUtil.TYPE) {
             PayUtil.handleResult(data);
         }

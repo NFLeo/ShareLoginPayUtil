@@ -33,7 +33,7 @@ public interface ShareInstance {
     void shareImage(int platform, ShareImageObject shareImageObject, Activity activity,
                     ShareListener listener);
 
-    void handleResult(Intent data);
+    void handleResult(int requestCode, int resultCode, Intent data);
 
     boolean isInstall(Context context);
 

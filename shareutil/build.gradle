@@ -5,7 +5,7 @@ publish {
     userOrg = 'nfleo'//bintray.com用户名
     groupId = 'com.nfleo'//jcenter上的路径
     artifactId = 'ShareLoginPayUtil'//项目名称
-    publishVersion = '1.0.2.1'//版本号
+    publishVersion = '1.0.3'//版本号
     desc = 'this is for test'
     website = 'https://github.com/NFLeo/ShareUtil'
 }
@@ -17,15 +17,6 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25
-
-        manifestPlaceholders = [
-                qq_id: "XXXXXX"
-        ]
-
-        ndk {
-            //选择要添加的对应cpu类型的.so库。
-            abiFilters 'armeabi'
-        }
     }
     buildTypes {
         release {
@@ -49,10 +40,10 @@ dependencies {
     // 微信
     implementation 'com.tencent.mm.opensdk:wechat-sdk-android-without-mta:5.1.4'
     // QQ
-    implementation files('libs/open_sdk_r5923_lite.jar')
     implementation files('libs/alipaySdk-20180403.jar')
+    api files('libs/open_sdk_r6008_lite.jar')
 }
 
-tasks.withType(JavaCompile){
+tasks.withType(JavaCompile) {
     options.encoding = "UTF-8"
 }

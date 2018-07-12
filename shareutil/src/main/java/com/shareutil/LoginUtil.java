@@ -34,7 +34,7 @@ public class LoginUtil {
         mPlatform = platform;
         mLoginListener = new LoginListenerProxy(listener);
         isFetchUserInfo = fetchUserInfo;
-        context.startActivity(_ShareActivity.newInstance(context, TYPE));
+        _ShareActivity.newInstance(context, TYPE);
     }
 
     static void action(Activity activity) {

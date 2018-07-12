@@ -32,7 +32,7 @@ public class PayUtil {
             mPayInstance = new AliPayInstance();
             mPayInstance.doPay((Activity) context, mPayParamsBean, mPayListener);
         } else {
-            context.startActivity(_ShareActivity.newInstance(context, TYPE));
+            _ShareActivity.newInstance(context, TYPE);
         }
     }
 

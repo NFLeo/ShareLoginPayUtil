@@ -14,11 +14,11 @@
             android:name="com.tencent.connect.common.AssistActivity"
             android:configChanges="orientation|keyboardHidden"
             android:screenOrientation="behind"
-            android:taskAffinity="me.shaohui.shareutil"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
         <activity
             android:name="com.tencent.tauth.AuthActivity"
+            android:launchMode="singleTask"
             android:noHistory="true">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -33,8 +33,12 @@
         <activity
             android:name="com.shareutil._ShareActivity"
             android:launchMode="singleTask"
-            android:taskAffinity="me.shaohui.shareutil"
-            android:theme="@style/translucent"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar">
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
 
         <!--wxpay start-->
         <activity-alias

@@ -104,7 +104,7 @@ public class DefaultShareInstance implements ShareInstance {
     }
 
     @Override
-    public void handleResult(Intent data) {
+    public void handleResult(int requestCode, int resultCode, Intent data) {
         // Default share, do nothing
     }
 

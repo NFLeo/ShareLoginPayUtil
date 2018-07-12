@@ -150,19 +150,21 @@ public class ShareUtil {
         mType = type;
         mPlatform = platform;
         mShareListener = buildProxyListener(listener);
-        context.startActivity(_ShareActivity.newInstance(context, TYPE));
+        _ShareActivity.newInstance(context, TYPE);
     }
 
     private static ShareListener buildProxyListener(ShareListener listener) {
         return new ShareListenerProxy(listener);
     }
 
-    public static void handleResult(Intent data) {
+    public static void handleResult(int requestCode, int resultCode, Intent data) {
         // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
         if (mShareInstance != null && data != null) {
-            mShareInstance.handleResult(data);
+            mShareInstance.handleResult(requestCode, resultCode, data);
         } else if (data == null) {
-            if (mPlatform != SharePlatform.WEIBO) {
+            if (mPlatform == SharePlatform.QQ || mPlatform == SharePlatform.QZONE) {
+                mShareInstance.handleResult(requestCode, resultCode, data);
+            } else if (mPlatform != SharePlatform.WEIBO) {
                 ShareLogger.e(ShareLogger.INFO.HANDLE_DATA_NULL);
             }
         } else {

@@ -189,7 +189,7 @@ public class WxShareInstance implements ShareInstance {
     }
 
     @Override
-    public void handleResult(Intent data) {
+    public void handleResult(int requestCode, int resultCode, Intent data) {
         mIWXAPI.handleIntent(data, new IWXAPIEventHandler() {
             @Override
             public void onReq(BaseReq baseReq) {

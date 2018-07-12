@@ -52,8 +52,9 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_qq:
-                ShareUtil.shareImage(getContext(), SharePlatform.QQ,
-                        "http://android-screenimgs.25pp.com/fs08/2018/05/11/4/110_f77a9c519c81005292e24f6eb324ea3b_234x360.jpg", mShareListener);
+                ShareUtil.shareMedia(getContext(), SharePlatform.QQ, "Title", "summary",
+                        "https://www.baidu.com", "http://android-screenimgs.25pp.com/fs08/2018/05/11/4/110_f77a9c519c81005292e24f6eb324ea3b_234x360.jpg",
+                        mShareListener);
                 break;
             case R.id.share_qzone:
                 ShareUtil.shareMedia(getContext(), SharePlatform.QZONE, "Title", "summary",
