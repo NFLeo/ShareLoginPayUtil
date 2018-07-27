@@ -45,6 +45,11 @@
             android:name="${applicationId}.wxapi.WXEntryActivity"
             android:exported="true"
             android:targetActivity="com.shareutil._ShareActivity" />
+
+        <activity-alias
+            android:name="${applicationId}.wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:targetActivity="com.shareutil._ShareActivity" />
         <!--wxpay end-->
 
         <!--alipay start-->

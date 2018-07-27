@@ -13,6 +13,9 @@
 - 支持视频分享
 
 ## ChangeLog
+#### 2018-07-27
+- 修复微信支付成功无法获取回调
+
 #### 2018-07-12
 - 修复QQ分享无法获取成功回调
 
@@ -70,7 +73,7 @@
         ...
     }
 
-    compile 'com.nfleo:ShareLoginPayUtil:1.0.1'
+    compile 'com.nfleo:ShareLoginPayUtil:1.0.3.2'
 ```
 2. 项目build.gradle 中添加如下代码
 ```

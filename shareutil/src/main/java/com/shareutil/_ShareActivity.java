@@ -72,6 +72,7 @@ public class _ShareActivity extends Activity {
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
+        setIntent(intent);
         ShareLogger.i(ShareLogger.INFO.ACTIVITY_NEW_INTENT);
         handleCallBack(0, 0, intent);
     }
