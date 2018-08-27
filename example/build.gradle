@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-    buildToolsVersion "27.0.2"
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     signingConfigs {
         config {
@@ -15,8 +15,8 @@ android {
 
     defaultConfig {
         applicationId "com.leo.project"
-        minSdkVersion 18
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
 
@@ -40,6 +40,10 @@ android {
             signingConfig signingConfigs.config
         }
     }
+
+    lintOptions {
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -50,7 +54,7 @@ dependencies {
     implementation project(':shareutil')
 //    implementation 'com.nfleo:ShareLoginPayUtil:1.0.2'
     implementation 'me.shaohui:bottomdialog:1.1.9'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
     implementation 'com.android.support.constraint:constraint-layout:2.0.0-alpha1'
     testImplementation 'junit:junit:4.12'
 //    implementation project(':library')

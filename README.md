@@ -13,6 +13,9 @@
 - 支持视频分享
 
 ## ChangeLog
+#### 2018-08-27
+- 抽离出gradle基础配置，方便调用时更改
+
 #### 2018-07-27
 - 修复微信支付成功无法获取回调
 
@@ -73,7 +76,7 @@
         ...
     }
 
-    compile 'com.nfleo:ShareLoginPayUtil:1.0.3.2'
+    compile 'com.nfleo:ShareLoginPayUtil:1.0.4'
 ```
 2. 项目build.gradle 中添加如下代码
 ```
@@ -89,6 +92,17 @@
             jcenter()
             maven { url "https://dl.bintray.com/thelasterstar/maven/" }
         }
+    }
+
+    ......
+
+    // 所需版本可自行配置
+    ext {
+        compileSdkVersion = 27
+
+        minSdkVersion = 21
+        targetSdkVersion = 27
+        supportVersion = "27.1.1"
     }
 ```
 

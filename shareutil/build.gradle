@@ -5,18 +5,20 @@ publish {
     userOrg = 'nfleo'//bintray.com用户名
     groupId = 'com.nfleo'//jcenter上的路径
     artifactId = 'ShareLoginPayUtil'//项目名称
-    publishVersion = '1.0.3.2'//版本号
+    publishVersion = '1.0.4'//版本号
     desc = 'this is for test'
     website = 'https://github.com/NFLeo/ShareLoginPayUtil'
 }
 
 android {
-    compileSdkVersion 27
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 27
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -30,7 +32,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
     implementation 'io.reactivex.rxjava2:rxjava:2.1.16'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'com.squareup.okhttp3:okhttp:3.10.0'

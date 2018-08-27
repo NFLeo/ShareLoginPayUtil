@@ -28,6 +28,19 @@ tasks.withType(Javadoc) {
     options.addStringOption('encoding', 'UTF-8')
 }
 
+ext {
+    compileSdkVersion = 27
+
+    minSdkVersion = 19
+    targetSdkVersion = 27
+    buildToolsVersion = "27.0.2"
+
+    versionCode = 110
+    versionName = "1.1.0"
+
+    supportVersion = "27.1.1"//SupportLib引用地址
+}
+
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
