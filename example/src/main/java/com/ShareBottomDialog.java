@@ -69,7 +69,7 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
                         "http://android-screenimgs.25pp.com/fs08/2018/05/11/4/110_f77a9c519c81005292e24f6eb324ea3b_234x360.jpg", mShareListener);
                 break;
             case R.id.share_wx:
-                ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", R.mipmap.ic_launcher, mShareListener);
+                ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", "http://img.funplanet.cn/user/photo/53/358de6e7da5212cb725872bda47113af.jpg", mShareListener);
                 break;
             case R.id.share_wx_mini:
                 ShareUtil.shareMedia(getContext(), SharePlatform.WX, "标题", "内容", "http://www.baidu.com", BitmapFactory.decodeResource(getResources(),

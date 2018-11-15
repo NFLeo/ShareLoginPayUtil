@@ -1,13 +1,38 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.novoda.bintray-release'
+
 publish {
     repoName = 'ShareLoginPayUtil'
     userOrg = 'nfleo'//bintray.com用户名
     groupId = 'com.nfleo'//jcenter上的路径
     artifactId = 'ShareLoginPayUtil'//项目名称
-    publishVersion = '1.0.4'//版本号
+    publishVersion = '1.0.5'//版本号
     desc = 'this is for test'
     website = 'https://github.com/NFLeo/ShareLoginPayUtil'
+}
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'ShareLoginPayUtil'
+
+    publishedGroupId = 'com.nfleo'
+    libraryName = 'ShareLoginPayUtil'
+    artifact = 'shareutil'
+
+    libraryDescription = 'Share Pay Login on Android'
+
+    siteUrl = 'https://github.com/NFLeo/ShareLoginPayUtil'
+    gitUrl = 'https://github.com/NFLeo/ShareLoginPayUtil.git'
+
+    libraryVersion = '1.0.5'
+
+    developerId = 'nfleo'
+    developerName = 'Leo shao'
+    developerEmail = 'shaoyouchao@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
 }
 
 android {
