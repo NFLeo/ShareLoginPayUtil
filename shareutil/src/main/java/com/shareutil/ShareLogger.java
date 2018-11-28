@@ -44,6 +44,17 @@ public class ShareLogger {
         public static final String WEIBO_AUTH_ERROR = "weibo auth error";
         public static final String UNKNOW_PLATFORM = "unknown platform";
 
+        // for login error code
+        public static final int NOT_INSTALL_CODE = 111;
+        public static final int UNKNOW_PLATFORM_CODE = 222;
+        public static final int ERR_GET_TOKEN_CODE = 333;
+        public static final int ERR_FETCH_CODE = 444;
+        public static final int WX_ERR_SENT_FAILED_CODE = 555;
+        public static final int WX_ERR_UNSUPPORT_CODE = 666;
+        public static final int WX_ERR_AUTH_DENIED_CODE = 777;
+        public static final int WX_ERR_AUTH_ERROR_CODE = 888;
+        public static final int ERR_WEIBO_AUTH_CODE = 999;
+
         // for pay
         public static final String PAY_SUCCESS = "call pay success";
         public static final String PAY_FAIL = "call pay failed";

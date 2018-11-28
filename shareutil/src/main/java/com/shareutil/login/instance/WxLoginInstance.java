@@ -31,6 +31,7 @@ import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
@@ -39,8 +40,9 @@ import okhttp3.Response;
 
 public class WxLoginInstance extends LoginInstance {
 
-    public static final String SCOPE_USER_INFO = "snsapi_userinfo";
+    private static final String SCOPE_USER_INFO = "snsapi_userinfo";
     private static final String SCOPE_BASE = "snsapi_base";
+    private Disposable mTokenSubscribe;
 
     private static final String BASE_URL = "https://api.weixin.qq.com/sns/";
 
@@ -56,6 +58,13 @@ public class WxLoginInstance extends LoginInstance {
         super(activity, listener, fetchUserInfo);
         mLoginListener = listener;
         mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());
+
+        if (!isInstall(activity)) {
+            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.NOT_INSTALL), ShareLogger.INFO.NOT_INSTALL_CODE);
+            activity.finish();
+            return;
+        }
+
         mClient = new OkHttpClient();
         this.fetchUserInfo = fetchUserInfo;
     }
@@ -70,9 +79,9 @@ public class WxLoginInstance extends LoginInstance {
 
     @SuppressLint("CheckResult")
     private void getToken(final String code) {
-        Flowable.create(new FlowableOnSubscribe<WxToken>() {
+        mTokenSubscribe = Flowable.create(new FlowableOnSubscribe<WxToken>() {
             @Override
-            public void subscribe(@NonNull FlowableEmitter<WxToken> wxTokenEmitter) throws Exception {
+            public void subscribe(@NonNull FlowableEmitter<WxToken> wxTokenEmitter) {
                 Request request = new Request.Builder().url(buildTokenUrl(code)).build();
                 try {
                     Response response = mClient.newCall(request).execute();
@@ -88,7 +97,7 @@ public class WxLoginInstance extends LoginInstance {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<WxToken>() {
                     @Override
-                    public void accept(@NonNull WxToken wxToken) throws Exception {
+                    public void accept(@NonNull WxToken wxToken) {
                         if (fetchUserInfo) {
                             mLoginListener.beforeFetchUserInfo(wxToken);
                             fetchUserInfo(wxToken);
@@ -98,8 +107,8 @@ public class WxLoginInstance extends LoginInstance {
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable.getMessage()));
+                    public void accept(@NonNull Throwable throwable) {
+                        mLoginListener.loginFailure(new Exception(throwable.getMessage()), ShareLogger.INFO.ERR_GET_TOKEN_CODE);
                     }
                 });
     }
@@ -107,9 +116,9 @@ public class WxLoginInstance extends LoginInstance {
     @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
-        Flowable.create(new FlowableOnSubscribe<WxUser>() {
+        mSubscribe = Flowable.create(new FlowableOnSubscribe<WxUser>() {
             @Override
-            public void subscribe(@NonNull FlowableEmitter<WxUser> wxUserEmitter) throws Exception {
+            public void subscribe(@NonNull FlowableEmitter<WxUser> wxUserEmitter) {
                 Request request = new Request.Builder().url(buildUserInfoUrl(token)).build();
                 try {
                     Response response = mClient.newCall(request).execute();
@@ -125,14 +134,14 @@ public class WxLoginInstance extends LoginInstance {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<WxUser>() {
                     @Override
-                    public void accept(@NonNull WxUser wxUser) throws Exception {
+                    public void accept(@NonNull WxUser wxUser) {
                         mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.WX, token, wxUser));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable));
+                    public void accept(@NonNull Throwable throwable) {
+                        mLoginListener.loginFailure(new Exception(throwable), ShareLogger.INFO.ERR_FETCH_CODE);
                     }
                 });
     }
@@ -156,16 +165,16 @@ public class WxLoginInstance extends LoginInstance {
                             mLoginListener.loginCancel();
                             break;
                         case BaseResp.ErrCode.ERR_SENT_FAILED:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_SENT_FAILED));
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_SENT_FAILED), ShareLogger.INFO.WX_ERR_SENT_FAILED_CODE);
                             break;
                         case BaseResp.ErrCode.ERR_UNSUPPORT:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_UNSUPPORT));
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_UNSUPPORT), ShareLogger.INFO.WX_ERR_UNSUPPORT_CODE);
                             break;
                         case BaseResp.ErrCode.ERR_AUTH_DENIED:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_DENIED));
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_DENIED), ShareLogger.INFO.WX_ERR_AUTH_DENIED_CODE);
                             break;
                         default:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_ERROR));
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_ERROR), ShareLogger.INFO.WX_ERR_AUTH_ERROR_CODE);
                     }
                 }
             }
@@ -179,6 +188,12 @@ public class WxLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
+        if (mSubscribe != null && !mSubscribe.isDisposed()) {
+            mSubscribe.dispose();
+        }
+        if (mTokenSubscribe != null && !mTokenSubscribe.isDisposed()) {
+            mTokenSubscribe.dispose();
+        }
         if (mIWXAPI != null) {
             mIWXAPI.detach();
         }
@@ -186,20 +201,15 @@ public class WxLoginInstance extends LoginInstance {
 
     private String buildTokenUrl(String code) {
         return BASE_URL
-                + "oauth2/access_token?appid="
-                + ShareManager.CONFIG.getWxId()
-                + "&secret="
-                + ShareManager.CONFIG.getWxSecret()
-                + "&code="
-                + code
+                + "oauth2/access_token?appid=" + ShareManager.CONFIG.getWxId()
+                + "&secret=" + ShareManager.CONFIG.getWxSecret()
+                + "&code=" + code
                 + "&grant_type=authorization_code";
     }
 
     private String buildUserInfoUrl(BaseToken token) {
         return BASE_URL
-                + "userinfo?access_token="
-                + token.getAccessToken()
-                + "&openid="
-                + token.getOpenid();
+                + "userinfo?access_token=" + token.getAccessToken()
+                + "&openid=" + token.getOpenid();
     }
 }

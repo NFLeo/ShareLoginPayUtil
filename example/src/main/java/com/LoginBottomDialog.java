@@ -1,16 +1,22 @@
 package com;
 
+import android.content.Context;
 import android.view.View;
 import android.widget.Toast;
-import me.shaohui.bottomdialog.BaseBottomDialog;
+
 import com.shareutil.LoginUtil;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
 import com.shareutil.login.LoginResult;
 
+import java.lang.ref.WeakReference;
+
+import me.shaohui.bottomdialog.BaseBottomDialog;
+
 public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickListener {
 
     private LoginListener mLoginListener;
+    private Context mCotext;
 
     @Override
     public int getLayoutRes() {
@@ -22,23 +28,8 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
         v.findViewById(R.id.share_qq).setOnClickListener(this);
         v.findViewById(R.id.share_weibo).setOnClickListener(this);
         v.findViewById(R.id.share_wx).setOnClickListener(this);
-
-        mLoginListener = new LoginListener() {
-            @Override
-            public void loginSuccess(LoginResult result) {
-                Toast.makeText(v.getContext(), "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void loginFailure(Exception e) {
-                Toast.makeText(v.getContext(), "登录失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void loginCancel() {
-                Toast.makeText(v.getContext(), "登录取消", Toast.LENGTH_SHORT).show();
-            }
-        };
+        mCotext = v.getContext();
+        mLoginListener = new MyLoginListener(LoginBottomDialog.this);
     }
 
     @Override
@@ -54,6 +45,43 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
                 LoginUtil.login(getContext(), LoginPlatform.WX, mLoginListener);
                 break;
         }
+
         dismiss();
+    }
+
+    private static class MyLoginListener extends LoginListener {
+
+        private WeakReference<LoginBottomDialog> context;
+
+        MyLoginListener(LoginBottomDialog context) {
+            this.context = new WeakReference<>(context);
+        }
+
+        @Override
+        public void loginSuccess(LoginResult result) {
+            if (context.get() != null) {
+                Toast.makeText(context.get().mCotext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
+            }
+            LoginUtil.recycle();
+            context.get().mLoginListener = null;
+        }
+
+        @Override
+        public void loginFailure(Exception e, int errorCode) {
+            if (context.get() != null) {
+                Toast.makeText(context.get().mCotext, "登录失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            LoginUtil.recycle();
+            context.get().mLoginListener = null;
+        }
+
+        @Override
+        public void loginCancel() {
+            if (context.get() != null) {
+                Toast.makeText(context.get().mCotext, "登录取消", Toast.LENGTH_SHORT).show();
+            }
+            LoginUtil.recycle();
+            context.get().mLoginListener = null;
+        }
     }
 }

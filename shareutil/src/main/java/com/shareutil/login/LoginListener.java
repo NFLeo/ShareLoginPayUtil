@@ -9,7 +9,7 @@ public abstract class LoginListener {
     public void beforeFetchUserInfo(BaseToken token) {
     }
 
-    public abstract void loginFailure(Exception e);
+    public abstract void loginFailure(Exception e, int errorCode);
 
     public abstract void loginCancel();
 }

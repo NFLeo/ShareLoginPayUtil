@@ -72,7 +72,7 @@ public class WeiboLoginInstance extends LoginInstance {
         public void onSuccess(final Oauth2AccessToken token) {
 
             if (token == null) {
-                listener.loginFailure(new Exception("授权失败"));
+                listener.loginFailure(new Exception( ShareLogger.INFO.WEIBO_AUTH_ERROR), ShareLogger.INFO.ERR_GET_TOKEN_CODE);
                 return;
             }
 
@@ -96,7 +96,7 @@ public class WeiboLoginInstance extends LoginInstance {
         @Override
         public void onFailure(WbConnectErrorMessage errorMessage) {
             if (mLoginListener != null) {
-                mLoginListener.loginFailure(new Exception(errorMessage.getErrorMessage()));
+                mLoginListener.loginFailure(new Exception(errorMessage.getErrorMessage()), ShareLogger.INFO.ERR_WEIBO_AUTH_CODE);
             }
         }
     }
@@ -109,7 +109,7 @@ public class WeiboLoginInstance extends LoginInstance {
     @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
-        Flowable.create(new FlowableOnSubscribe<WeiboUser>() {
+        mSubscribe = Flowable.create(new FlowableOnSubscribe<WeiboUser>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<WeiboUser> weiboUserEmitter) {
                 OkHttpClient client = new OkHttpClient();
@@ -136,7 +136,7 @@ public class WeiboLoginInstance extends LoginInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable));
+                        mLoginListener.loginFailure(new Exception(throwable), ShareLogger.INFO.ERR_FETCH_CODE);
                     }
                 });
     }
@@ -161,6 +161,9 @@ public class WeiboLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
+        if (mSubscribe != null && !mSubscribe.isDisposed()) {
+            mSubscribe.dispose();
+        }
         mSsoHandler = null;
         mLoginListener = null;
     }

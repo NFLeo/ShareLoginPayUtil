@@ -52,7 +52,7 @@ public class QQLoginInstance extends LoginInstance {
     public QQLoginInstance(Activity activity, final LoginListener listener,
                            final boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
-        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity.getApplicationContext());
+        mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity);
         mLoginListener = listener;
         mIUiListener = new IUiListener() {
             @Override
@@ -68,15 +68,14 @@ public class QQLoginInstance extends LoginInstance {
                     }
                 } catch (JSONException e) {
                     ShareLogger.i(ShareLogger.INFO.ILLEGAL_TOKEN);
-                    mLoginListener.loginFailure(e);
+                    mLoginListener.loginFailure(e, ShareLogger.INFO.ERR_GET_TOKEN_CODE);
                 }
             }
 
             @Override
             public void onError(UiError uiError) {
                 ShareLogger.i(ShareLogger.INFO.QQ_LOGIN_ERROR);
-                listener.loginFailure(
-                        new Exception("QQError: " + uiError.errorCode + uiError.errorDetail));
+                listener.loginFailure(new Exception(uiError.errorDetail), uiError.errorCode);
             }
 
             @Override
@@ -95,9 +94,9 @@ public class QQLoginInstance extends LoginInstance {
     @SuppressLint("CheckResult")
     @Override
     public void fetchUserInfo(final BaseToken token) {
-        Flowable.create(new FlowableOnSubscribe<QQUser>() {
+        mSubscribe = Flowable.create(new FlowableOnSubscribe<QQUser>() {
             @Override
-            public void subscribe(@NonNull FlowableEmitter<QQUser> qqUserEmitter) throws Exception {
+            public void subscribe(@NonNull FlowableEmitter<QQUser> qqUserEmitter) {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder().url(buildUserInfoUrl(token, URL)).build();
 
@@ -116,14 +115,14 @@ public class QQLoginInstance extends LoginInstance {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<QQUser>() {
                     @Override
-                    public void accept(@NonNull QQUser qqUser) throws Exception {
+                    public void accept(@NonNull QQUser qqUser) {
                         mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.QQ, token, qqUser));
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(@NonNull Throwable throwable) throws Exception {
-                        mLoginListener.loginFailure(new Exception(throwable));
+                    public void accept(@NonNull Throwable throwable) {
+                        mLoginListener.loginFailure(new Exception(throwable), ShareLogger.INFO.ERR_FETCH_CODE);
                     }
                 });
     }
@@ -157,6 +156,9 @@ public class QQLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
+        if (mSubscribe != null && !mSubscribe.isDisposed()) {
+            mSubscribe.dispose();
+        }
         mTencent.releaseResource();
         mIUiListener = null;
         mLoginListener = null;

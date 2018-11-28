@@ -7,10 +7,13 @@ import android.content.Intent;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.result.BaseToken;
 
+import io.reactivex.disposables.Disposable;
+
 public abstract class LoginInstance {
 
-    public LoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
+    Disposable mSubscribe;
 
+    LoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
     }
 
     public abstract void doLogin(Activity activity, LoginListener listener, boolean fetchUserInfo);

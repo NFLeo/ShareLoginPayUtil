@@ -13,6 +13,8 @@ import com.shareutil.login.instance.WeiboLoginInstance;
 import com.shareutil.login.instance.WxLoginInstance;
 import com.shareutil.login.result.BaseToken;
 
+import java.lang.ref.WeakReference;
+
 public class LoginUtil {
 
     private static LoginInstance mLoginInstance;
@@ -50,7 +52,7 @@ public class LoginUtil {
                 mLoginInstance = new WxLoginInstance(activity, mLoginListener, isFetchUserInfo);
                 break;
             default:
-                mLoginListener.loginFailure(new Exception(ShareLogger.INFO.UNKNOW_PLATFORM));
+                mLoginListener.loginFailure(new Exception(ShareLogger.INFO.UNKNOW_PLATFORM), ShareLogger.INFO.UNKNOW_PLATFORM_CODE);
                 activity.finish();
         }
         mLoginInstance.doLogin(activity, mLoginListener, isFetchUserInfo);
@@ -74,37 +76,45 @@ public class LoginUtil {
 
     private static class LoginListenerProxy extends LoginListener {
 
-        private LoginListener mListener;
+        private WeakReference<LoginListener> wefLoginListener;
 
         LoginListenerProxy(LoginListener listener) {
-            mListener = listener;
+            wefLoginListener = new WeakReference<>(listener);
         }
 
         @Override
         public void loginSuccess(LoginResult result) {
             ShareLogger.i(ShareLogger.INFO.LOGIN_SUCCESS);
-            mListener.loginSuccess(result);
+            if (wefLoginListener.get() != null) {
+                wefLoginListener.get().loginSuccess(result);
+            }
             recycle();
         }
 
         @Override
-        public void loginFailure(Exception e) {
+        public void loginFailure(Exception e, int errorCode) {
             ShareLogger.i(ShareLogger.INFO.LOGIN_FAIL);
-            mListener.loginFailure(e);
+            if (wefLoginListener.get() != null) {
+                wefLoginListener.get().loginFailure(e, errorCode);
+            }
             recycle();
         }
 
         @Override
         public void loginCancel() {
             ShareLogger.i(ShareLogger.INFO.LOGIN_CANCEL);
-            mListener.loginCancel();
+            if (wefLoginListener.get() != null) {
+                wefLoginListener.get().loginCancel();
+            }
             recycle();
         }
 
         @Override
         public void beforeFetchUserInfo(BaseToken token) {
             ShareLogger.i(ShareLogger.INFO.LOGIN_AUTH_SUCCESS);
-            mListener.beforeFetchUserInfo(token);
+            if (wefLoginListener.get() != null) {
+                wefLoginListener.get().beforeFetchUserInfo(token);
+            }
         }
     }
 }
