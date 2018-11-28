@@ -59,12 +59,6 @@ public class WxLoginInstance extends LoginInstance {
         mLoginListener = listener;
         mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());
 
-        if (!isInstall(activity)) {
-            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.NOT_INSTALL), ShareLogger.INFO.NOT_INSTALL_CODE);
-            activity.finish();
-            return;
-        }
-
         mClient = new OkHttpClient();
         this.fetchUserInfo = fetchUserInfo;
     }

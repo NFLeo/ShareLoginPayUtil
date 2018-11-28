@@ -50,10 +50,17 @@ public class LoginUtil {
                 break;
             case LoginPlatform.WX:
                 mLoginInstance = new WxLoginInstance(activity, mLoginListener, isFetchUserInfo);
+                if (!mLoginInstance.isInstall(activity)) {
+                    mLoginListener.loginFailure(new Exception(ShareLogger.INFO.NOT_INSTALL), ShareLogger.INFO.NOT_INSTALL_CODE);
+                    recycle();
+                    activity.finish();
+                    return;
+                }
                 break;
             default:
                 mLoginListener.loginFailure(new Exception(ShareLogger.INFO.UNKNOW_PLATFORM), ShareLogger.INFO.UNKNOW_PLATFORM_CODE);
                 activity.finish();
+                return;
         }
         mLoginInstance.doLogin(activity, mLoginListener, isFetchUserInfo);
     }
