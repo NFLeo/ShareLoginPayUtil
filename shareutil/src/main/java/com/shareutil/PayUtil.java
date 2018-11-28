@@ -11,6 +11,8 @@ import com.shareutil.pay.instance.AliPayInstance;
 import com.shareutil.pay.instance.PayInstance;
 import com.shareutil.pay.instance.WXPayInstance;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Describe : 支付
  * Created by Leo on 2018/5/7.
@@ -68,30 +70,36 @@ public class PayUtil {
 
     private static class PayListenerProxy extends PayListener {
 
-        private PayListener mListener;
+        private WeakReference<PayListener> mListener;
 
         PayListenerProxy(PayListener listener) {
-            mListener = listener;
+            mListener = new WeakReference<>(listener);
         }
 
         @Override
         public void paySuccess() {
             ShareLogger.i(ShareLogger.INFO.PAY_SUCCESS);
-            mListener.paySuccess();
+            if (mListener.get() != null) {
+                mListener.get().paySuccess();
+            }
             recycle();
         }
 
         @Override
         public void payFailed(Exception e) {
             ShareLogger.i(ShareLogger.INFO.PAY_FAIL);
-            mListener.payFailed(e);
+            if (mListener.get() != null) {
+                mListener.get().payFailed(e);
+            }
             recycle();
         }
 
         @Override
         public void payCancel() {
             ShareLogger.i(ShareLogger.INFO.PAY_CANCEL);
-            mListener.payCancel();
+            if (mListener.get() != null) {
+                mListener.get().payCancel();
+            }
             recycle();
         }
     }

@@ -12,6 +12,8 @@ import com.shareutil.pay.AliPayParamsBean;
 import com.shareutil.pay.AliPayResultBean;
 import com.shareutil.pay.PayListener;
 
+import java.lang.ref.WeakReference;
+
 /**
  * Describe : 支付宝支付
  * Created by Leo on 2018/5/7 on 15:26.
@@ -29,30 +31,22 @@ public class AliPayInstance implements PayInstance<AliPayParamsBean> {
 
         if (payParams == null || TextUtils.isEmpty(payParams.getOrderInfo())) {
             payListener.payFailed(new Exception("pay params can`t be null"));
+            recycle();
             return;
         }
 
-        Runnable payRunnable = new Runnable() {
-            @Override
-            public void run() {
-                PayTask payTask = new PayTask(activity);
-                String payResult = payTask.pay(payParams.getOrderInfo(), true);
-                Message msg = new Message();
-                msg.what = PAY_RESULT;
-                msg.obj = payResult;
-                mHandler.sendMessage(msg);
-            }
-        };
-
-        Thread payThread = new Thread(payRunnable);
-        payThread.start();
+        new Thread(new PayRunnable(activity, payParams)).start();
     }
 
     @Override
     public void handleResult(Intent data) { }
 
     @Override
-    public void recycle() {  }
+    public void recycle() {
+        if (mHandler != null) {
+            mHandler.removeCallbacksAndMessages(null);
+        }
+    }
 
     @SuppressLint("HandlerLeak")
     private static Handler mHandler = new Handler() {
@@ -83,4 +77,26 @@ public class AliPayInstance implements PayInstance<AliPayParamsBean> {
             }
         }
     };
+
+    private static class PayRunnable implements Runnable {
+        private WeakReference<Activity> activity;
+        private AliPayParamsBean payParams;
+
+        PayRunnable(Activity activity, AliPayParamsBean payParams) {
+            this.activity = new WeakReference<>(activity);
+            this.payParams = payParams;
+        }
+
+        @Override
+        public void run() {
+            if (activity.get() != null) {
+                PayTask payTask = new PayTask(activity.get());
+                String payResult = payTask.pay(payParams.getOrderInfo(), true);
+                Message msg = new Message();
+                msg.what = PAY_RESULT;
+                msg.obj = payResult;
+                mHandler.sendMessage(msg);
+            }
+        }
+    }
 }

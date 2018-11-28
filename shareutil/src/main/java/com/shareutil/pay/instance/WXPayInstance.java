@@ -73,6 +73,7 @@ public class WXPayInstance implements PayInstance<WXPayParamsBean>, IWXAPIEventH
     public void recycle() {
         if (mIWXAPI != null) {
             mIWXAPI.detach();
+            mIWXAPI = null;
         }
     }
 
@@ -83,7 +84,6 @@ public class WXPayInstance implements PayInstance<WXPayParamsBean>, IWXAPIEventH
 
     @Override
     public void onReq(BaseReq baseReq) {
-
     }
 
     @Override
