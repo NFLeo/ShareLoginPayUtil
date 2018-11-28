@@ -1,5 +1,6 @@
 package com;
 
+import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.view.View;
 import android.widget.Toast;
@@ -8,11 +9,14 @@ import com.shareutil.ShareUtil;
 import com.shareutil.share.ShareListener;
 import com.shareutil.share.SharePlatform;
 
+import java.lang.ref.WeakReference;
+
 import me.shaohui.bottomdialog.BaseBottomDialog;
 
 public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickListener {
 
     private ShareListener mShareListener;
+    private Context mContext;
 
     @Override
     public int getLayoutRes() {
@@ -29,23 +33,9 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
         v.findViewById(R.id.share_wx_timeline).setOnClickListener(this);
         v.findViewById(R.id.share_system).setOnClickListener(this);
 
-        mShareListener = new ShareListener() {
-            @Override
-            public void shareSuccess() {
-                Toast.makeText(v.getContext(), "分享成功", Toast.LENGTH_SHORT).show();
-            }
+        mContext = v.getContext();
 
-            @Override
-            public void shareFailure(Exception e) {
-                Toast.makeText(v.getContext(), "分享失败", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void shareCancel() {
-                Toast.makeText(v.getContext(), "取消分享", Toast.LENGTH_SHORT).show();
-
-            }
-        };
+        mShareListener = new MyShareListener(ShareBottomDialog.this);
     }
 
     @Override
@@ -76,9 +66,45 @@ public class ShareBottomDialog extends BaseBottomDialog implements View.OnClickL
                         R.mipmap.ic_launcher), "gh_41bb43658d5e", "share/card/card", mShareListener);
                 break;
             case R.id.share_system:
-                ShareUtil.shareMedia(getContext(), SharePlatform.DEFAULT, "标题", "内容", "http://www.baidu.com", R.mipmap.ic_launcher, mShareListener);
+                ShareUtil.shareText(getContext(), SharePlatform.DEFAULT, "标题", mShareListener);
                 break;
         }
         dismiss();
+    }
+
+    private static class MyShareListener extends ShareListener {
+
+        private WeakReference<ShareBottomDialog> context;
+
+        MyShareListener(ShareBottomDialog context) {
+            this.context = new WeakReference<>(context);
+        }
+
+        @Override
+        public void shareSuccess() {
+            if (context.get() != null) {
+                Toast.makeText(context.get().mContext, "分享成功 ", Toast.LENGTH_SHORT).show();
+            }
+            ShareUtil.recycle();
+            context.get().mShareListener = null;
+        }
+
+        @Override
+        public void shareFailure(Exception e) {
+            if (context.get() != null) {
+                Toast.makeText(context.get().mContext, e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            ShareUtil.recycle();
+            context.get().mShareListener = null;
+        }
+
+        @Override
+        public void shareCancel() {
+            if (context.get() != null) {
+                Toast.makeText(context.get().mContext, "取消分享", Toast.LENGTH_SHORT).show();
+            }
+            ShareUtil.recycle();
+            context.get().mShareListener = null;
+        }
     }
 }

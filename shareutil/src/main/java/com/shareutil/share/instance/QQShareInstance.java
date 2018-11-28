@@ -29,6 +29,7 @@ import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
@@ -36,6 +37,8 @@ import io.reactivex.schedulers.Schedulers;
 public class QQShareInstance implements ShareInstance {
 
     private Tencent mTencent;
+    private Disposable mShareFunc;
+    private Disposable mShareImage;
 
     public QQShareInstance(Context context, String app_id) {
         mTencent = Tencent.createInstance(app_id, context.getApplicationContext());
@@ -69,7 +72,7 @@ public class QQShareInstance implements ShareInstance {
     @SuppressLint("CheckResult")
     private void shareFunc(final int platform, final String title, final String targetUrl, final String summary,
                            final ShareImageObject shareImageObject, final boolean immediate, final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<String>() {
+        mShareFunc = Flowable.create(new FlowableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<String> emitter) {
                 try {
@@ -104,8 +107,9 @@ public class QQShareInstance implements ShareInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
-                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
+                        recycle();
+                        activity.finish();
                     }
                 });
     }
@@ -114,7 +118,7 @@ public class QQShareInstance implements ShareInstance {
     @Override
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
                            final Activity activity, final ShareListener listener) {
-        Flowable.create(new FlowableOnSubscribe<String>() {
+        mShareImage = Flowable.create(new FlowableOnSubscribe<String>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<String> emitter) throws Exception {
                 try {
@@ -145,8 +149,9 @@ public class QQShareInstance implements ShareInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
-                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
+                        recycle();
+                        activity.finish();
                     }
                 });
     }
@@ -170,14 +175,6 @@ public class QQShareInstance implements ShareInstance {
             }
         }
         return false;
-    }
-
-    @Override
-    public void recycle() {
-        if (mTencent != null) {
-            mTencent.releaseResource();
-            mTencent = null;
-        }
     }
 
     private void shareToQQForMedia(String title, String summary, String targetUrl, String thumbUrl,
@@ -228,5 +225,19 @@ public class QQShareInstance implements ShareInstance {
                 QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD);
         params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
         mTencent.publishToQzone(activity, params, listener);
+    }
+
+    @Override
+    public void recycle() {
+        if (mShareFunc != null && !mShareFunc.isDisposed()) {
+            mShareFunc.dispose();
+        }
+        if (mShareImage != null && !mShareImage.isDisposed()) {
+            mShareImage.dispose();
+        }
+        if (mTencent != null) {
+            mTencent.releaseResource();
+            mTencent = null;
+        }
     }
 }

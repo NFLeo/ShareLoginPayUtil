@@ -31,6 +31,7 @@ import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
@@ -41,6 +42,9 @@ public class WxShareInstance implements ShareInstance {
      * 微信分享限制thumb image必须小于32Kb，否则点击分享会没有反应
      */
     private IWXAPI mIWXAPI;
+
+    private Disposable mShareFunc;
+    private Disposable mShareImage;
 
     private static final int THUMB_SIZE = 32 * 1024;
     private static final int TARGET_SIZE = 200;
@@ -83,7 +87,7 @@ public class WxShareInstance implements ShareInstance {
     private void shareFunc(final int platform, final String title, final String targetUrl, final String summary, final String miniId, final String miniPath,
                            final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
 
-        Flowable.create(new FlowableOnSubscribe<byte[]>() {
+        mShareFunc = Flowable.create(new FlowableOnSubscribe<byte[]>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<byte[]> emitter) {
                 try {
@@ -110,8 +114,9 @@ public class WxShareInstance implements ShareInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
-                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
+                        recycle();
+                        activity.finish();
                     }
                 });
     }
@@ -148,7 +153,7 @@ public class WxShareInstance implements ShareInstance {
     public void shareImage(final int platform, final ShareImageObject shareImageObject,
                            final Activity activity, final ShareListener listener) {
 
-        Flowable.create(new FlowableOnSubscribe<Pair<Bitmap, byte[]>>() {
+        mShareImage = Flowable.create(new FlowableOnSubscribe<Pair<Bitmap, byte[]>>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<Pair<Bitmap, byte[]>> emitter) {
                 try {
@@ -182,8 +187,9 @@ public class WxShareInstance implements ShareInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
-                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
+                        recycle();
+                        activity.finish();
                     }
                 });
     }
@@ -216,11 +222,6 @@ public class WxShareInstance implements ShareInstance {
         return mIWXAPI.isWXAppInstalled();
     }
 
-    @Override
-    public void recycle() {
-        mIWXAPI.detach();
-    }
-
     private void sendMessage(int platform, WXMediaMessage message, String transaction) {
         SendMessageToWX.Req req = new SendMessageToWX.Req();
         req.transaction = transaction;
@@ -234,5 +235,20 @@ public class WxShareInstance implements ShareInstance {
 
     private String buildTransaction(String type) {
         return System.currentTimeMillis() + type;
+    }
+
+    @Override
+    public void recycle() {
+        if (mShareFunc != null && !mShareFunc.isDisposed()) {
+            mShareFunc.dispose();
+        }
+        if (mShareImage != null && !mShareImage.isDisposed()) {
+            mShareImage.dispose();
+        }
+
+        if (mIWXAPI != null) {
+            mIWXAPI.detach();
+            mIWXAPI = null;
+        }
     }
 }

@@ -25,6 +25,7 @@ import io.reactivex.FlowableEmitter;
 import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
@@ -35,14 +36,13 @@ import io.reactivex.schedulers.Schedulers;
  */
 public class WeiboShareInstance implements ShareInstance {
 
-    private Context context;
     private WbShareHandler shareHandler;
+    private Disposable mShareImage;
 
     private static final int TARGET_SIZE = 1024;
     private static final int TARGET_LENGTH = 2097152;
 
     public WeiboShareInstance(Context context, String appId, String redirectUrl, String scope) {
-        this.context = context;
         AuthInfo authInfo = new AuthInfo(context, appId, redirectUrl, scope);
         WbSdk.install(context, authInfo);
         shareHandler = new WbShareHandler((Activity) context);
@@ -103,16 +103,11 @@ public class WeiboShareInstance implements ShareInstance {
         return shareHandler.isWbAppInstalled();
     }
 
-    @Override
-    public void recycle() {
-        shareHandler = null;
-    }
-
     @SuppressLint("CheckResult")
     private void shareTextOrImage(final ShareImageObject shareImageObject, final String title, final String targetUrl, final String summary,
                                   final Activity activity, final ShareListener listener) {
 
-        Flowable.create(new FlowableOnSubscribe<Pair<String, byte[]>>() {
+        mShareImage = Flowable.create(new FlowableOnSubscribe<Pair<String, byte[]>>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<Pair<String, byte[]>> emitter) {
                 try {
@@ -140,8 +135,9 @@ public class WeiboShareInstance implements ShareInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
-                        activity.finish();
                         listener.shareFailure(new Exception(throwable.getMessage()));
+                        recycle();
+                        activity.finish();
                     }
                 });
     }
@@ -150,7 +146,7 @@ public class WeiboShareInstance implements ShareInstance {
     private void shareTextOrImage(final Pair<String, byte[]> shareImageObject, final String title, final String targetUrl, final String summary,
                                   final Activity activity, final ShareListener listener) {
 
-        Flowable.create(new FlowableOnSubscribe<Pair<String, byte[]>>() {
+        mShareImage = Flowable.create(new FlowableOnSubscribe<Pair<String, byte[]>>() {
             @Override
             public void subscribe(@NonNull FlowableEmitter<Pair<String, byte[]>> emitter) {
                 try {
@@ -177,8 +173,9 @@ public class WeiboShareInstance implements ShareInstance {
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
-                        activity.finish();
                         listener.shareFailure(new Exception(throwable));
+                        recycle();
+                        activity.finish();
                     }
                 });
     }
@@ -221,5 +218,15 @@ public class WeiboShareInstance implements ShareInstance {
         imageObject.imagePath = object.first;
         imageObject.imageData = object.second;
         return imageObject;
+    }
+
+    @Override
+    public void recycle() {
+
+        if (mShareImage != null && !mShareImage.isDisposed()) {
+            mShareImage.dispose();
+        }
+
+        shareHandler = null;
     }
 }

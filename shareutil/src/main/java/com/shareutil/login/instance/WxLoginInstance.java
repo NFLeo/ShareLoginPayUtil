@@ -190,6 +190,7 @@ public class WxLoginInstance extends LoginInstance {
         }
         if (mIWXAPI != null) {
             mIWXAPI.detach();
+            mIWXAPI = null;
         }
     }
 

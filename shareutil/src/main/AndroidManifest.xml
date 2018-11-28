@@ -10,6 +10,17 @@
         android:label="@string/app_name"
         android:supportsRtl="true">
 
+        <!--兼容系统分享 7.0不支持uri跳转 必须使用content://替代-->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="system_share"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
         <activity
             android:name="com.tencent.connect.common.AssistActivity"
             android:configChanges="orientation|keyboardHidden"

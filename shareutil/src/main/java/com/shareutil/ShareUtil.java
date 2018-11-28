@@ -19,6 +19,7 @@ import com.shareutil.share.instance.WxShareInstance;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
@@ -63,6 +64,7 @@ public class ShareUtil {
 
         if (!mShareInstance.isInstall(activity)) {
             mShareListener.shareFailure(new Exception(ShareLogger.INFO.NOT_INSTALL));
+            recycle();
             activity.finish();
             return;
         }
@@ -149,21 +151,17 @@ public class ShareUtil {
 
         mType = type;
         mPlatform = platform;
-        mShareListener = buildProxyListener(listener);
+        mShareListener = new ShareListenerProxy(listener);
         _ShareActivity.newInstance(context, TYPE);
-    }
-
-    private static ShareListener buildProxyListener(ShareListener listener) {
-        return new ShareListenerProxy(listener);
     }
 
     public static void handleResult(int requestCode, int resultCode, Intent data) {
         // 微博分享会同时回调onActivityResult和onNewIntent， 而且前者返回的intent为null
         if (mShareInstance != null && data != null) {
             mShareInstance.handleResult(requestCode, resultCode, data);
-        } else if (data == null) {
+        } else if (mShareInstance != null) {
             if (mPlatform == SharePlatform.QQ || mPlatform == SharePlatform.QZONE) {
-                mShareInstance.handleResult(requestCode, resultCode, data);
+                mShareInstance.handleResult(requestCode, resultCode, null);
             } else if (mPlatform != SharePlatform.WEIBO) {
                 ShareLogger.e(ShareLogger.INFO.HANDLE_DATA_NULL);
             }
@@ -208,6 +206,7 @@ public class ShareUtil {
             mShareInstance.recycle();
         }
         mShareInstance = null;
+        mShareListener = null;
     }
 
     @Deprecated
@@ -240,37 +239,45 @@ public class ShareUtil {
 
     private static class ShareListenerProxy extends ShareListener {
 
-        private final ShareListener mShareListener;
+        private final WeakReference<ShareListener> mShareListener;
 
         ShareListenerProxy(ShareListener listener) {
-            mShareListener = listener;
+            mShareListener = new WeakReference<>(listener);
         }
 
         @Override
         public void shareSuccess() {
             ShareLogger.i(ShareLogger.INFO.SHARE_SUCCESS);
-            ShareUtil.recycle();
-            mShareListener.shareSuccess();
+            if (mShareListener.get() != null) {
+                mShareListener.get().shareSuccess();
+            }
+            recycle();
         }
 
         @Override
         public void shareFailure(Exception e) {
             ShareLogger.i(ShareLogger.INFO.SHARE_FAILURE);
-            ShareUtil.recycle();
-            mShareListener.shareFailure(e);
+            if (mShareListener.get() != null) {
+                mShareListener.get().shareFailure(e);
+            }
+            recycle();
         }
 
         @Override
         public void shareCancel() {
             ShareLogger.i(ShareLogger.INFO.SHARE_CANCEL);
-            ShareUtil.recycle();
-            mShareListener.shareCancel();
+            if (mShareListener.get() != null) {
+                mShareListener.get().shareCancel();
+            }
+            recycle();
         }
 
         @Override
         public void shareRequest() {
             ShareLogger.i(ShareLogger.INFO.SHARE_REQUEST);
-            mShareListener.shareRequest();
+            if (mShareListener.get() != null) {
+                mShareListener.get().shareRequest();
+            }
         }
     }
 }

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.v4.content.FileProvider;
 
 import com.shareutil.R;
 import com.shareutil.share.ImageDecoder;
@@ -74,7 +75,7 @@ public class DefaultShareInstance implements ShareInstance {
             @Override
             public void subscribe(@NonNull FlowableEmitter<Uri> emitter) {
                 try {
-                    Uri uri = Uri.fromFile(new File(ImageDecoder.decode(activity, shareImageObject)));
+                    Uri uri = FileProvider.getUriForFile(activity, "system_share", new File(ImageDecoder.decode(activity, shareImageObject)));
                     emitter.onNext(uri);
                     emitter.onComplete();
                 } catch (Exception e) {
@@ -99,6 +100,7 @@ public class DefaultShareInstance implements ShareInstance {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
                         listener.shareFailure(new Exception(throwable));
+                        activity.finish();
                     }
                 });
     }
