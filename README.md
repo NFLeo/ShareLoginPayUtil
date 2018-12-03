@@ -13,6 +13,13 @@
 - 支持视频分享
 
 ## ChangeLog
+#### 2018-12-3
+- 统一provider authorities方便多provider并存
+- authorities 必须为 包名.file.provider
+#### 2018-11-28
+- 修复分享、登录、支付引发的内存泄漏
+- 登录结果回调新增登录失败code
+- 修复7.0无法调用系统分享问题
 #### 2018-08-27
 - 抽离出gradle基础配置，方便调用时更改
 
