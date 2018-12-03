@@ -4,6 +4,8 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.support.v4.content.FileProvider;
 
@@ -75,7 +77,8 @@ public class DefaultShareInstance implements ShareInstance {
             @Override
             public void subscribe(@NonNull FlowableEmitter<Uri> emitter) {
                 try {
-                    Uri uri = FileProvider.getUriForFile(activity, "system_share", new File(ImageDecoder.decode(activity, shareImageObject)));
+                    Uri uri = FileProvider.getUriForFile(activity, getAppPackageName(activity) + ".file.provider",
+                            new File(ImageDecoder.decode(activity, shareImageObject)));
                     emitter.onNext(uri);
                     emitter.onComplete();
                 } catch (Exception e) {
@@ -117,5 +120,17 @@ public class DefaultShareInstance implements ShareInstance {
 
     @Override
     public void recycle() {
+    }
+
+    public String getAppPackageName(Context context) {
+        String packagename = null;
+        try {
+            PackageManager packageManager = context.getPackageManager();
+            PackageInfo info = packageManager.getPackageInfo(context.getPackageName(), 0);
+            packagename = info.packageName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return packagename;
     }
 }
