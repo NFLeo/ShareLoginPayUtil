@@ -9,14 +9,11 @@ import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
 import com.shareutil.login.LoginResult;
 
-import java.lang.ref.WeakReference;
-
 import me.shaohui.bottomdialog.BaseBottomDialog;
 
 public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickListener {
 
-    private LoginListener mLoginListener;
-    private Context mCotext;
+    private Context mContext;
 
     @Override
     public int getLayoutRes() {
@@ -28,60 +25,68 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
         v.findViewById(R.id.share_qq).setOnClickListener(this);
         v.findViewById(R.id.share_weibo).setOnClickListener(this);
         v.findViewById(R.id.share_wx).setOnClickListener(this);
-        mCotext = v.getContext();
-        mLoginListener = new MyLoginListener(LoginBottomDialog.this);
+        mContext = v.getContext();
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_qq:
-                LoginUtil.login(getContext(), LoginPlatform.QQ, mLoginListener);
+                LoginUtil.login(getContext(), LoginPlatform.QQ, new LoginListener() {
+                    @Override
+                    public void loginSuccess(LoginResult result) {
+                        Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void loginFailure(Exception e, int errorCode) {
+                        Toast.makeText(mContext, "登录失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void loginCancel() {
+                        Toast.makeText(mContext, "取消登录 ", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
             case R.id.share_weibo:
-                LoginUtil.login(getContext(), LoginPlatform.WEIBO, mLoginListener);
+                LoginUtil.login(getContext(), LoginPlatform.WEIBO, new LoginListener() {
+                    @Override
+                    public void loginSuccess(LoginResult result) {
+                        Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void loginFailure(Exception e, int errorCode) {
+                        Toast.makeText(mContext, "登录失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void loginCancel() {
+                        Toast.makeText(mContext, "取消登录 ", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
             case R.id.share_wx:
-                LoginUtil.login(getContext(), LoginPlatform.WX, mLoginListener);
+                LoginUtil.login(getContext(), LoginPlatform.WX, new LoginListener() {
+                    @Override
+                    public void loginSuccess(LoginResult result) {
+                        Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void loginFailure(Exception e, int errorCode) {
+                        Toast.makeText(mContext, "登录失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void loginCancel() {
+                        Toast.makeText(mContext, "取消登录 ", Toast.LENGTH_SHORT).show();
+                    }
+                });
                 break;
         }
 
         dismiss();
-    }
-
-    private static class MyLoginListener extends LoginListener {
-
-        private WeakReference<LoginBottomDialog> context;
-
-        MyLoginListener(LoginBottomDialog context) {
-            this.context = new WeakReference<>(context);
-        }
-
-        @Override
-        public void loginSuccess(LoginResult result) {
-            if (context.get() != null) {
-                Toast.makeText(context.get().mCotext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
-            }
-            LoginUtil.recycle();
-            context.get().mLoginListener = null;
-        }
-
-        @Override
-        public void loginFailure(Exception e, int errorCode) {
-            if (context.get() != null) {
-                Toast.makeText(context.get().mCotext, "登录失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-            LoginUtil.recycle();
-            context.get().mLoginListener = null;
-        }
-
-        @Override
-        public void loginCancel() {
-            if (context.get() != null) {
-                Toast.makeText(context.get().mCotext, "登录取消", Toast.LENGTH_SHORT).show();
-            }
-            LoginUtil.recycle();
-            context.get().mLoginListener = null;
-        }
     }
 }

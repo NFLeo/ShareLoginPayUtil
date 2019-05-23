@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.shareutil.LoginUtil;
 import com.shareutil.ShareLogger;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
@@ -73,6 +74,7 @@ public class WeiboLoginInstance extends LoginInstance {
 
             if (token == null) {
                 listener.loginFailure(new Exception( ShareLogger.INFO.WEIBO_AUTH_ERROR), ShareLogger.INFO.ERR_GET_TOKEN_CODE);
+                LoginUtil.recycle();
                 return;
             }
 
@@ -83,6 +85,7 @@ public class WeiboLoginInstance extends LoginInstance {
                 fetchUserInfo(weiboToken);
             } else {
                 mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WEIBO, weiboToken));
+                LoginUtil.recycle();
             }
         }
 
@@ -90,6 +93,7 @@ public class WeiboLoginInstance extends LoginInstance {
         public void cancel() {
             if (mLoginListener != null) {
                 mLoginListener.loginCancel();
+                LoginUtil.recycle();
             }
         }
 
@@ -97,12 +101,19 @@ public class WeiboLoginInstance extends LoginInstance {
         public void onFailure(WbConnectErrorMessage errorMessage) {
             if (mLoginListener != null) {
                 mLoginListener.loginFailure(new Exception(errorMessage.getErrorMessage()), ShareLogger.INFO.ERR_WEIBO_AUTH_CODE);
+                LoginUtil.recycle();
             }
         }
     }
 
     @Override
     public void doLogin(Activity activity, final LoginListener listener, final boolean fetchUserInfo) {
+        if (mSsoHandler == null) {
+            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WEIBO_LOGIN_ERROR), ShareLogger.INFO.ERR_WEIBO_AUTH_CODE);
+            LoginUtil.recycle();
+            return;
+        }
+
         mSsoHandler.authorize(new SelfWbAuthListener(listener, fetchUserInfo));
     }
 
@@ -132,11 +143,13 @@ public class WeiboLoginInstance extends LoginInstance {
                     public void accept(@NonNull WeiboUser weiboUser) throws Exception {
                         mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.WEIBO, token, weiboUser));
+                        LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) throws Exception {
                         mLoginListener.loginFailure(new Exception(throwable), ShareLogger.INFO.ERR_FETCH_CODE);
+                        LoginUtil.recycle();
                     }
                 });
     }
@@ -156,13 +169,14 @@ public class WeiboLoginInstance extends LoginInstance {
 
     @Override
     public boolean isInstall(Context context) {
-        return mSsoHandler.isWbAppInstalled();
+        return WbSdk.isWbInstall(context);
     }
 
     @Override
     public void recycle() {
         if (mSubscribe != null && !mSubscribe.isDisposed()) {
             mSubscribe.dispose();
+            mSsoHandler = null;
         }
         mSsoHandler = null;
         mLoginListener = null;

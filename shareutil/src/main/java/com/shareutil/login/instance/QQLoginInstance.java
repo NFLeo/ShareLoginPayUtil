@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.text.TextUtils;
 
+import com.shareutil.LoginUtil;
 import com.shareutil.ShareLogger;
 import com.shareutil.ShareManager;
 import com.shareutil.login.LoginListener;
@@ -65,10 +66,12 @@ public class QQLoginInstance extends LoginInstance {
                         fetchUserInfo(token);
                     } else {
                         listener.loginSuccess(new LoginResult(LoginPlatform.QQ, token));
+                        LoginUtil.recycle();
                     }
                 } catch (JSONException e) {
                     ShareLogger.i(ShareLogger.INFO.ILLEGAL_TOKEN);
                     mLoginListener.loginFailure(e, ShareLogger.INFO.ERR_GET_TOKEN_CODE);
+                    LoginUtil.recycle();
                 }
             }
 
@@ -76,18 +79,27 @@ public class QQLoginInstance extends LoginInstance {
             public void onError(UiError uiError) {
                 ShareLogger.i(ShareLogger.INFO.QQ_LOGIN_ERROR);
                 listener.loginFailure(new Exception(uiError.errorDetail), uiError.errorCode);
+                LoginUtil.recycle();
             }
 
             @Override
             public void onCancel() {
                 ShareLogger.i(ShareLogger.INFO.AUTH_CANCEL);
                 listener.loginCancel();
+                LoginUtil.recycle();
             }
         };
     }
 
     @Override
     public void doLogin(Activity activity, final LoginListener listener, boolean fetchUserInfo) {
+        if (mTencent == null || mIUiListener == null) {
+            ShareLogger.i(ShareLogger.INFO.QQ_LOGIN_ERROR);
+            listener.loginFailure(new Exception(ShareLogger.INFO.QQ_LOGIN_ERROR), -1);
+            LoginUtil.recycle();
+            return;
+        }
+
         mTencent.login(activity, SCOPE, mIUiListener);
     }
 
@@ -118,11 +130,13 @@ public class QQLoginInstance extends LoginInstance {
                     public void accept(@NonNull QQUser qqUser) {
                         mLoginListener.loginSuccess(
                                 new LoginResult(LoginPlatform.QQ, token, qqUser));
+                        LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
                         mLoginListener.loginFailure(new Exception(throwable), ShareLogger.INFO.ERR_FETCH_CODE);
+                        LoginUtil.recycle();
                     }
                 });
     }
@@ -158,6 +172,7 @@ public class QQLoginInstance extends LoginInstance {
     public void recycle() {
         if (mSubscribe != null && !mSubscribe.isDisposed()) {
             mSubscribe.dispose();
+            mSubscribe = null;
         }
         mTencent.releaseResource();
         mIUiListener = null;

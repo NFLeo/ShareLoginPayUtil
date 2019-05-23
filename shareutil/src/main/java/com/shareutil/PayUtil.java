@@ -11,8 +11,6 @@ import com.shareutil.pay.instance.AliPayInstance;
 import com.shareutil.pay.instance.PayInstance;
 import com.shareutil.pay.instance.WXPayInstance;
 
-import java.lang.ref.WeakReference;
-
 /**
  * Describe : 支付
  * Created by Leo on 2018/5/7.
@@ -29,7 +27,7 @@ public class PayUtil {
     public static void pay(Context context, @PayPlatform.Platform int platform, IPayParamsBean paramsBean, PayListener listener) {
         mPlatform = platform;
         mPayParamsBean = paramsBean;
-        mPayListener = new PayListenerProxy(listener);
+        mPayListener = listener;
         if (platform == PayPlatform.ALIPAY) {
             mPayInstance = new AliPayInstance();
             mPayInstance.doPay((Activity) context, mPayParamsBean, mPayListener);
@@ -48,6 +46,7 @@ public class PayUtil {
                 break;
             default:
                 mPayListener.payFailed(new Exception(ShareLogger.INFO.UNKNOW_PLATFORM));
+                recycle();
                 activity.finish();
         }
         mPayInstance.doPay(activity, mPayParamsBean, mPayListener);
@@ -66,41 +65,5 @@ public class PayUtil {
         mPayInstance = null;
         mPayListener = null;
         mPlatform = 0;
-    }
-
-    private static class PayListenerProxy extends PayListener {
-
-        private WeakReference<PayListener> mListener;
-
-        PayListenerProxy(PayListener listener) {
-            mListener = new WeakReference<>(listener);
-        }
-
-        @Override
-        public void paySuccess() {
-            ShareLogger.i(ShareLogger.INFO.PAY_SUCCESS);
-            if (mListener.get() != null) {
-                mListener.get().paySuccess();
-            }
-            recycle();
-        }
-
-        @Override
-        public void payFailed(Exception e) {
-            ShareLogger.i(ShareLogger.INFO.PAY_FAIL);
-            if (mListener.get() != null) {
-                mListener.get().payFailed(e);
-            }
-            recycle();
-        }
-
-        @Override
-        public void payCancel() {
-            ShareLogger.i(ShareLogger.INFO.PAY_CANCEL);
-            if (mListener.get() != null) {
-                mListener.get().payCancel();
-            }
-            recycle();
-        }
     }
 }

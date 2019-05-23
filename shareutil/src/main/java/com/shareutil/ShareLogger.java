@@ -39,9 +39,11 @@ public class ShareLogger {
         public static final String LOGIN_CANCEL = "call login cancel";
         public static final String LOGIN_AUTH_SUCCESS = "call before fetch user info";
         public static final String ILLEGAL_TOKEN = "Illegal token, please check your config";
+        public static final String WX_LOGIN_ERROR = "WX login error";
         public static final String QQ_LOGIN_ERROR = "QQ login error";
         public static final String QQ_AUTH_SUCCESS = "QQ auth success";
         public static final String WEIBO_AUTH_ERROR = "weibo auth error";
+        public static final String WEIBO_LOGIN_ERROR = "weibo login error";
         public static final String UNKNOW_PLATFORM = "unknown platform";
 
         // for login error code
@@ -57,7 +59,7 @@ public class ShareLogger {
 
         // for pay
         public static final String PAY_SUCCESS = "call pay success";
-        public static final String PAY_FAIL = "call pay failed";
+        public static final String PAY_FAILED = "call pay failed";
         public static final String PAY_CANCEL = "call pay cancel";
 
         public static final String WX_ERR_SENT_FAILED = "Wx sent failed";
@@ -75,5 +77,4 @@ public class ShareLogger {
         public static final String ACTIVITY_NEW_INTENT = "ShareActivity onNewIntent";
 
     }
-
 }

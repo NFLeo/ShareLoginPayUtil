@@ -14,7 +14,6 @@ public class LoginPlatform {
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.PARAMETER)
     public @interface Platform {
-
     }
 
     public static final int QQ = 1;

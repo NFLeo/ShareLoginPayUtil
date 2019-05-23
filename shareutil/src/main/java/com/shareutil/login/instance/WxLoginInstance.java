@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 
+import com.shareutil.LoginUtil;
 import com.shareutil.ShareLogger;
 import com.shareutil.ShareManager;
 import com.shareutil.login.LoginListener;
@@ -97,12 +98,15 @@ public class WxLoginInstance extends LoginInstance {
                             fetchUserInfo(wxToken);
                         } else {
                             mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
+                            LoginUtil.recycle();
                         }
+
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
                         mLoginListener.loginFailure(new Exception(throwable.getMessage()), ShareLogger.INFO.ERR_GET_TOKEN_CODE);
+                        LoginUtil.recycle();
                     }
                 });
     }
@@ -129,19 +133,26 @@ public class WxLoginInstance extends LoginInstance {
                 .subscribe(new Consumer<WxUser>() {
                     @Override
                     public void accept(@NonNull WxUser wxUser) {
-                        mLoginListener.loginSuccess(
-                                new LoginResult(LoginPlatform.WX, token, wxUser));
+                        mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, token, wxUser));
+                        LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
                         mLoginListener.loginFailure(new Exception(throwable), ShareLogger.INFO.ERR_FETCH_CODE);
+                        LoginUtil.recycle();
                     }
                 });
     }
 
     @Override
     public void handleResult(int requestCode, int resultCode, Intent data) {
+        if (mIWXAPI == null) {
+            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_LOGIN_ERROR), ShareLogger.INFO.WX_ERR_AUTH_ERROR_CODE);
+            LoginUtil.recycle();
+            return;
+        }
+
         mIWXAPI.handleIntent(data, new IWXAPIEventHandler() {
             @Override
             public void onReq(BaseReq baseReq) {
@@ -157,18 +168,24 @@ public class WxLoginInstance extends LoginInstance {
                             break;
                         case BaseResp.ErrCode.ERR_USER_CANCEL:
                             mLoginListener.loginCancel();
+                            LoginUtil.recycle();
                             break;
                         case BaseResp.ErrCode.ERR_SENT_FAILED:
                             mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_SENT_FAILED), ShareLogger.INFO.WX_ERR_SENT_FAILED_CODE);
+                            LoginUtil.recycle();
                             break;
                         case BaseResp.ErrCode.ERR_UNSUPPORT:
                             mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_UNSUPPORT), ShareLogger.INFO.WX_ERR_UNSUPPORT_CODE);
+                            LoginUtil.recycle();
                             break;
                         case BaseResp.ErrCode.ERR_AUTH_DENIED:
                             mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_DENIED), ShareLogger.INFO.WX_ERR_AUTH_DENIED_CODE);
+                            LoginUtil.recycle();
                             break;
                         default:
                             mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_ERROR), ShareLogger.INFO.WX_ERR_AUTH_ERROR_CODE);
+                            LoginUtil.recycle();
+                            break;
                     }
                 }
             }
@@ -184,9 +201,11 @@ public class WxLoginInstance extends LoginInstance {
     public void recycle() {
         if (mSubscribe != null && !mSubscribe.isDisposed()) {
             mSubscribe.dispose();
+            mSubscribe = null;
         }
         if (mTokenSubscribe != null && !mTokenSubscribe.isDisposed()) {
             mTokenSubscribe.dispose();
+            mTokenSubscribe = null;
         }
         if (mIWXAPI != null) {
             mIWXAPI.detach();

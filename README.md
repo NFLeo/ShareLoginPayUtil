@@ -8,18 +8,25 @@
     5. 同步更新微博官方分享支付（2018-6-22）
     6. 支持网络依赖
 ```
+
 ## TODO
 - 支持多图分享
 - 支持视频分享
 
 ## ChangeLog
+#### 2019-05-23
+- 更新支付宝支付（修改为aar依赖方式）
+- 去除登录、分享、支付所产生的内存泄漏
+
 #### 2018-12-3
 - 统一provider authorities方便多provider并存
 - authorities 必须为 包名.file.provider
+
 #### 2018-11-28
 - 修复分享、登录、支付引发的内存泄漏
 - 登录结果回调新增登录失败code
 - 修复7.0无法调用系统分享问题
+
 #### 2018-08-27
 - 抽离出gradle基础配置，方便调用时更改
 
@@ -83,7 +90,8 @@
         ...
     }
 
-    compile 'com.nfleo:ShareLoginPayUtil:1.0.4'
+    // 新版本发布不了，只能通过aar方式了
+    // api 'com.nfleo:ShareLoginPayUtil:1.1.1'
 ```
 2. 项目build.gradle 中添加如下代码
 ```
@@ -96,8 +104,17 @@
 
     allprojects {
         repositories {
-            jcenter()
+            maven {url "https://maven.google.com"}
+            google()
+
+            // 微博 SDK 所需的配置
             maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+
+            // 支付宝 SDK AAR 包所需的配置
+            flatDir {
+                dirs '../shareutil/libs'
+            }
+            jcenter()
         }
     }
 
@@ -124,6 +141,26 @@
                     .weiboRedirectUrl(REDIRECT_URL)
                     .wxSecret(WX_ID);
             ShareManager.init(config);
+
+            ** 系统分享图片必须添加以下两步
+            1. 必须在AndroidManifest.xml添加 provider
+            <!--兼容系统分享 7.0不支持uri跳转 必须使用content://替代-->
+            <provider
+                android:name="android.support.v4.content.FileProvider"
+                android:authorities="${applicationId}.file.provider"  // 必须写成这个值
+                android:exported="false"
+                android:grantUriPermissions="true">
+                <meta-data
+                    android:name="android.support.FILE_PROVIDER_PATHS"
+                    android:resource="@xml/file_paths" />
+            </provider>
+
+            2.res文件夹下创建xml文件夹，并在xml下创建file_paths.xml 文件名随便取
+            注：分享图片保存地址为 /storage/emulated/0/Android/data/com.leo.project/files/share_image.jpg
+            因此保存到 外部存储区域根目录下（使用 external-files-path）
+            <paths xmlns:android="http://schemas.android.com/apk/res/android">
+                <external-files-path name="name" path="" />
+            </paths>
 
 ### 分享使用
 

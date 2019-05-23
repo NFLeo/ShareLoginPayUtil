@@ -33,7 +33,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class WxShareInstance implements ShareInstance {
@@ -99,14 +98,7 @@ public class WxShareInstance implements ShareInstance {
             }
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) {
-                        listener.shareRequest();
-                    }
-                })
-                .subscribe(new Consumer<byte[]>() {
+                .observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<byte[]>() {
                     @Override
                     public void accept(@NonNull byte[] bytes) {
                         handleshareWx(platform, title, targetUrl, summary, bytes, miniId, miniPath);
@@ -167,12 +159,6 @@ public class WxShareInstance implements ShareInstance {
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) {
-                        listener.shareRequest();
-                    }
-                })
                 .subscribe(new Consumer<Pair<Bitmap, byte[]>>() {
                     @Override
                     public void accept(@NonNull Pair<Bitmap, byte[]> pair) {
@@ -196,6 +182,10 @@ public class WxShareInstance implements ShareInstance {
 
     @Override
     public void handleResult(int requestCode, int resultCode, Intent data) {
+        if (mIWXAPI == null) {
+            return;
+        }
+
         mIWXAPI.handleIntent(data, new IWXAPIEventHandler() {
             @Override
             public void onReq(BaseReq baseReq) {
@@ -206,13 +196,19 @@ public class WxShareInstance implements ShareInstance {
                 switch (baseResp.errCode) {
                     case BaseResp.ErrCode.ERR_OK:
                         ShareUtil.mShareListener.shareSuccess();
+                        ShareUtil.recycle();
                         break;
                     case BaseResp.ErrCode.ERR_USER_CANCEL:
                         ShareUtil.mShareListener.shareCancel();
+                        ShareUtil.recycle();
                         break;
                     default:
                         ShareUtil.mShareListener.shareFailure(new Exception(baseResp.errStr));
+                        ShareUtil.recycle();
+                        break;
                 }
+
+                recycle();
             }
         });
     }
@@ -231,6 +227,7 @@ public class WxShareInstance implements ShareInstance {
         req.scene = platform == SharePlatform.WX_TIMELINE ? SendMessageToWX.Req.WXSceneTimeline
                 : SendMessageToWX.Req.WXSceneSession;
         mIWXAPI.sendReq(req);
+        recycle();
     }
 
     private String buildTransaction(String type) {
@@ -241,9 +238,11 @@ public class WxShareInstance implements ShareInstance {
     public void recycle() {
         if (mShareFunc != null && !mShareFunc.isDisposed()) {
             mShareFunc.dispose();
+            mShareFunc = null;
         }
         if (mShareImage != null && !mShareImage.isDisposed()) {
             mShareImage.dispose();
+            mShareImage = null;
         }
 
         if (mIWXAPI != null) {

@@ -23,7 +23,6 @@ import io.reactivex.FlowableOnSubscribe;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class DefaultShareInstance implements ShareInstance {
@@ -34,16 +33,18 @@ public class DefaultShareInstance implements ShareInstance {
     @Override
     public void shareText(int platform, String text, Activity activity, ShareListener listener) {
         handleShare(activity, SHARE_TYPE_TEXT, "", "", text, null);
-
     }
 
     @Override
-    public void shareMedia(int platform, final String title, final String targetUrl, final String summary, String miniId, String miniPath, ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
+    public void shareMedia(int platform, final String title, final String targetUrl, final String summary,
+                           String miniId, String miniPath, ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
         createImageShare(title, targetUrl, summary, shareImageObject, activity, listener);
     }
 
     @Override
-    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener) {
+    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId,
+                           String miniPath, ShareImageObject shareImageObject, boolean shareImmediate,
+                           Activity activity, ShareListener listener) {
         createImageShare(title, targetUrl, summary, shareImageObject, activity, listener);
     }
 
@@ -88,12 +89,6 @@ public class DefaultShareInstance implements ShareInstance {
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) {
-                        listener.shareRequest();
-                    }
-                })
                 .subscribe(new Consumer<Uri>() {
                     @Override
                     public void accept(@NonNull Uri uri) {
@@ -103,6 +98,7 @@ public class DefaultShareInstance implements ShareInstance {
                     @Override
                     public void accept(@NonNull Throwable throwable) {
                         listener.shareFailure(new Exception(throwable));
+                        recycle();
                         activity.finish();
                     }
                 });

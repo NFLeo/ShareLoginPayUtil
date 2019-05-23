@@ -17,9 +17,17 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
+        maven {url "https://maven.google.com"}
         google()
+
+        // 微博 SDK 所需的配置
         maven { url "https://dl.bintray.com/thelasterstar/maven/" }
+
+        // 支付宝 SDK AAR 包所需的配置
+        flatDir {
+            dirs '../shareutil/libs'
+        }
+        jcenter()
     }
 }
 
@@ -38,7 +46,7 @@ ext {
     versionCode = 110
     versionName = "1.1.0"
 
-    supportVersion = "27.1.1"//SupportLib引用地址
+    supportVersion = "27.1.0"//SupportLib引用地址
 }
 
 task clean(type: Delete) {

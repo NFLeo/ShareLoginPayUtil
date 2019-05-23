@@ -19,7 +19,6 @@ import com.shareutil.share.instance.WxShareInstance;
 import com.tencent.mm.opensdk.openapi.IWXAPI;
 import com.tencent.mm.opensdk.openapi.WXAPIFactory;
 
-import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
@@ -151,7 +150,7 @@ public class ShareUtil {
 
         mType = type;
         mPlatform = platform;
-        mShareListener = new ShareListenerProxy(listener);
+        mShareListener = listener;
         _ShareActivity.newInstance(context, TYPE);
     }
 
@@ -235,49 +234,5 @@ public class ShareUtil {
     public static boolean isWeiXinInstalled(Context context) {
         IWXAPI api = WXAPIFactory.createWXAPI(context, ShareManager.CONFIG.getWxId(), true);
         return api.isWXAppInstalled();
-    }
-
-    private static class ShareListenerProxy extends ShareListener {
-
-        private final WeakReference<ShareListener> mShareListener;
-
-        ShareListenerProxy(ShareListener listener) {
-            mShareListener = new WeakReference<>(listener);
-        }
-
-        @Override
-        public void shareSuccess() {
-            ShareLogger.i(ShareLogger.INFO.SHARE_SUCCESS);
-            if (mShareListener.get() != null) {
-                mShareListener.get().shareSuccess();
-            }
-            recycle();
-        }
-
-        @Override
-        public void shareFailure(Exception e) {
-            ShareLogger.i(ShareLogger.INFO.SHARE_FAILURE);
-            if (mShareListener.get() != null) {
-                mShareListener.get().shareFailure(e);
-            }
-            recycle();
-        }
-
-        @Override
-        public void shareCancel() {
-            ShareLogger.i(ShareLogger.INFO.SHARE_CANCEL);
-            if (mShareListener.get() != null) {
-                mShareListener.get().shareCancel();
-            }
-            recycle();
-        }
-
-        @Override
-        public void shareRequest() {
-            ShareLogger.i(ShareLogger.INFO.SHARE_REQUEST);
-            if (mShareListener.get() != null) {
-                mShareListener.get().shareRequest();
-            }
-        }
     }
 }

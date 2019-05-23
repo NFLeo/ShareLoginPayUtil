@@ -52,19 +52,6 @@
             android:targetActivity="com.shareutil._ShareActivity" />
         <!--wxpay end-->
 
-        <!--alipay start-->
-        <activity
-            android:name="com.alipay.sdk.app.H5PayActivity"
-            android:configChanges="orientation|keyboardHidden|navigation|screenSize"
-            android:exported="false"
-            android:screenOrientation="behind" />
-        <activity
-            android:name="com.alipay.sdk.auth.AuthActivity"
-            android:configChanges="orientation|keyboardHidden|navigation"
-            android:exported="false"
-            android:screenOrientation="behind" />
-        <!--alipay end-->
-
     </application>
 
 </manifest>

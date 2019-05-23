@@ -27,7 +27,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
@@ -80,27 +79,34 @@ public class WeiboShareInstance implements ShareInstance {
 
     @Override
     public void handleResult(int requestCode, int resultCode, Intent intent) {
+        if (shareHandler == null) {
+            return;
+        }
+
         shareHandler.doResultIntent(intent, new WbShareCallback() {
             @Override
             public void onWbShareSuccess() {
                 ShareUtil.mShareListener.shareSuccess();
+                ShareUtil.recycle();
             }
 
             @Override
             public void onWbShareCancel() {
                 ShareUtil.mShareListener.shareCancel();
+                ShareUtil.recycle();
             }
 
             @Override
             public void onWbShareFail() {
                 ShareUtil.mShareListener.shareFailure(new Exception("分享失败"));
+                ShareUtil.recycle();
             }
         });
     }
 
     @Override
     public boolean isInstall(Context context) {
-        return shareHandler.isWbAppInstalled();
+        return WbSdk.isWbInstall(context);
     }
 
     @SuppressLint("CheckResult")
@@ -121,12 +127,6 @@ public class WeiboShareInstance implements ShareInstance {
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) {
-                        listener.shareRequest();
-                    }
-                })
                 .subscribe(new Consumer<Pair<String, byte[]>>() {
                     @Override
                     public void accept(@NonNull Pair<String, byte[]> stringPair) {
@@ -159,12 +159,6 @@ public class WeiboShareInstance implements ShareInstance {
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) {
-                        listener.shareRequest();
-                    }
-                })
                 .subscribe(new Consumer<Pair<String, byte[]>>() {
                     @Override
                     public void accept(@NonNull Pair<String, byte[]> stringPair) {
@@ -192,6 +186,7 @@ public class WeiboShareInstance implements ShareInstance {
         }
 
         shareHandler.shareMessage(message, false);
+        recycle();
     }
 
     /**
@@ -225,8 +220,8 @@ public class WeiboShareInstance implements ShareInstance {
 
         if (mShareImage != null && !mShareImage.isDisposed()) {
             mShareImage.dispose();
+            mShareImage = null;
         }
-
         shareHandler = null;
     }
 }

@@ -31,7 +31,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.functions.LongConsumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class QQShareInstance implements ShareInstance {
@@ -50,6 +49,7 @@ public class QQShareInstance implements ShareInstance {
             shareToQZoneForText(text, activity, listener);
         } else {
             listener.shareFailure(new Exception(ShareLogger.INFO.QQ_NOT_SUPPORT_SHARE_TXT));
+            recycle();
             activity.finish();
         }
     }
@@ -89,12 +89,6 @@ public class QQShareInstance implements ShareInstance {
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
                 .subscribe(new Consumer<String>() {
                     @Override
                     public void accept(@NonNull String s) {
@@ -131,12 +125,6 @@ public class QQShareInstance implements ShareInstance {
         }, BackpressureStrategy.DROP)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnRequest(new LongConsumer() {
-                    @Override
-                    public void accept(long t) throws Exception {
-                        listener.shareRequest();
-                    }
-                })
                 .subscribe(new Consumer<String>() {
                     @Override
                     public void accept(@NonNull String localPath) throws Exception {
@@ -179,6 +167,13 @@ public class QQShareInstance implements ShareInstance {
 
     private void shareToQQForMedia(String title, String summary, String targetUrl, String thumbUrl,
                                    Activity activity, ShareListener listener) {
+        if (mTencent == null) {
+            listener.shareFailure(new Exception("分享失败"));
+            recycle();
+            activity.finish();
+            return;
+        }
+
         final Bundle params = new Bundle();
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         params.putString(QQShare.SHARE_TO_QQ_TITLE, title);
@@ -186,25 +181,49 @@ public class QQShareInstance implements ShareInstance {
         params.putString(QQShare.SHARE_TO_QQ_TARGET_URL, targetUrl);
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL, thumbUrl);
         mTencent.shareToQQ(activity, params, listener);
+        recycle();
     }
 
     private void shareToQQForImage(String localUrl, Activity activity, ShareListener listener) {
+        if (mTencent == null) {
+            listener.shareFailure(new Exception("分享失败"));
+            recycle();
+            activity.finish();
+            return;
+        }
+
         Bundle params = new Bundle();
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, localUrl);
         mTencent.shareToQQ(activity, params, listener);
+        recycle();
     }
 
     private void shareToQZoneForText(String text, Activity activity, ShareListener listener) {
+        if (mTencent == null) {
+            listener.shareFailure(new Exception("分享失败"));
+            recycle();
+            activity.finish();
+            return;
+        }
+
         final Bundle params = new Bundle();
         params.putInt(QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
                 QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD);
         params.putString(QzoneShare.SHARE_TO_QQ_SUMMARY, text);
         mTencent.publishToQzone(activity, params, listener);
+        recycle();
     }
 
     private void shareToQZoneForMedia(String title, String targetUrl, String summary,
                                       String imageUrl, Activity activity, ShareListener listener) {
+        if (mTencent == null) {
+            listener.shareFailure(new Exception("分享失败"));
+            recycle();
+            activity.finish();
+            return;
+        }
+
         final Bundle params = new Bundle();
         final ArrayList<String> image = new ArrayList<>();
         image.add(imageUrl);
@@ -215,9 +234,17 @@ public class QQShareInstance implements ShareInstance {
         params.putString(QzoneShare.SHARE_TO_QQ_TARGET_URL, targetUrl);
         params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
         mTencent.shareToQzone(activity, params, listener);
+        recycle();
     }
 
     private void shareToQzoneForImage(String imagePath, Activity activity, ShareListener listener) {
+        if (mTencent == null) {
+            listener.shareFailure(new Exception("分享失败"));
+            recycle();
+            activity.finish();
+            return;
+        }
+
         final Bundle params = new Bundle();
         final ArrayList<String> image = new ArrayList<>();
         image.add(imagePath);
@@ -225,15 +252,19 @@ public class QQShareInstance implements ShareInstance {
                 QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD);
         params.putStringArrayList(QzoneShare.SHARE_TO_QQ_IMAGE_URL, image);
         mTencent.publishToQzone(activity, params, listener);
+
+        recycle();
     }
 
     @Override
     public void recycle() {
         if (mShareFunc != null && !mShareFunc.isDisposed()) {
             mShareFunc.dispose();
+            mShareFunc = null;
         }
         if (mShareImage != null && !mShareImage.isDisposed()) {
             mShareImage.dispose();
+            mShareImage = null;
         }
         if (mTencent != null) {
             mTencent.releaseResource();
