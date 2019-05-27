@@ -6,6 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+
+import com.shareutil.login.LoginPlatform;
 
 public class _ShareActivity extends Activity {
 
@@ -25,12 +29,15 @@ public class _ShareActivity extends Activity {
         }
         intent.putExtra(TYPE, type);
         context.startActivity(intent);
-        ((Activity) context).overridePendingTransition(0, 0);
+        if (context instanceof Activity) {
+            ((Activity) context).overridePendingTransition(0, 0);
+        }
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         ShareLogger.i(ShareLogger.INFO.ACTIVITY_CREATE);
         isNew = true;
 
@@ -40,6 +47,9 @@ public class _ShareActivity extends Activity {
             // 分享
             ShareUtil.action(this);
         } else if (mType == LoginUtil.TYPE) {
+            if (LoginUtil.getPlatform() == LoginPlatform.INS) {
+                setCusContentView();
+            }
             // 登录
             LoginUtil.action(this);
         } else if (mType == PayUtil.TYPE) {
@@ -50,6 +60,13 @@ public class _ShareActivity extends Activity {
             ShareUtil.handleResult(-1, -1, getIntent());
             finish();
         }
+    }
+
+    private void setCusContentView() {
+        FrameLayout container = new FrameLayout(_ShareActivity.this);
+        container.setId(R.id.id_share_container);
+        container.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        setContentView(container);
     }
 
     @Override
@@ -67,6 +84,12 @@ public class _ShareActivity extends Activity {
     public void finish() {
         super.finish();
         overridePendingTransition(0, 0);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        LoginUtil.onBackPressed();
     }
 
     @Override

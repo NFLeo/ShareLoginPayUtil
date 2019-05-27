@@ -47,16 +47,12 @@ public class WeiboLoginInstance extends LoginInstance {
     private static final String USER_INFO = "https://api.weibo.com/2/users/show.json";
 
     private SsoHandler mSsoHandler;
-    private Context context;
-    private LoginListener mLoginListener;
 
     public WeiboLoginInstance(Activity activity, LoginListener listener, String appId, String redirectUrl, String scope, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
-        this.context = activity;
         AuthInfo authInfo = new AuthInfo(activity, appId, redirectUrl, scope);
         WbSdk.install(activity, authInfo);
         mSsoHandler = new SsoHandler(activity);
-        mLoginListener = listener;
     }
 
     private class SelfWbAuthListener implements WbAuthListener {
@@ -78,8 +74,8 @@ public class WeiboLoginInstance extends LoginInstance {
                 return;
             }
 
-            WeiboToken weiboToken = WeiboToken.parse(token);
-            AccessTokenKeeper.writeAccessToken(context, token);
+            WeiboToken weiboToken = new WeiboToken(token);
+            AccessTokenKeeper.writeAccessToken(mActivity, token);
             if (fetchUserInfo) {
                 mLoginListener.beforeFetchUserInfo(weiboToken);
                 fetchUserInfo(weiboToken);
@@ -174,11 +170,7 @@ public class WeiboLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
-        if (mSubscribe != null && !mSubscribe.isDisposed()) {
-            mSubscribe.dispose();
-            mSsoHandler = null;
-        }
+        super.recycle();
         mSsoHandler = null;
-        mLoginListener = null;
     }
 }

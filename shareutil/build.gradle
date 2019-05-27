@@ -14,6 +14,7 @@ publish {
 android {
 
     compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -31,11 +32,11 @@ android {
         abortOnError false
     }
 
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
+//    repositories {
+//        flatDir {
+//            dirs 'libs'
+//        }
+//    }
 }
 
 dependencies {
@@ -51,6 +52,9 @@ dependencies {
     api files('libs/open_sdk_r6008_lite.jar')
     // 支付宝 SDK AAR 包所需的配置
     implementation (name: 'alipaySdk-15.6.2-20190416165036', ext: 'aar')
+
+    implementation 'com.facebook.android:facebook-login:4.33.0'
+//    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 }
 
 tasks.withType(JavaCompile) {

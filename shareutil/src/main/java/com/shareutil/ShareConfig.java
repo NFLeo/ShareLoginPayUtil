@@ -14,6 +14,10 @@ public class ShareConfig {
 
     private String weiboScope = "email";
 
+    private String insClientId;
+
+    private String insScope;
+
     private boolean debug;
 
     public static ShareConfig instance() {
@@ -77,6 +81,22 @@ public class ShareConfig {
 
     public String getWeiboScope() {
         return weiboScope;
+    }
+
+    public String getInsClientId() {
+        return insClientId;
+    }
+
+    public void insClientId(String insClientId) {
+        this.insClientId = insClientId;
+    }
+
+    public String getInsScope() {
+        return insScope;
+    }
+
+    public void insScope(String insScope) {
+        this.insScope = insScope;
     }
 
     public boolean isDebug() {

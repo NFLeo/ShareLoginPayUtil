@@ -6,6 +6,7 @@ import android.content.Intent;
 
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
+import com.shareutil.login.instance.InsLoginInstance;
 import com.shareutil.login.instance.LoginInstance;
 import com.shareutil.login.instance.QQLoginInstance;
 import com.shareutil.login.instance.WeiboLoginInstance;
@@ -64,6 +65,16 @@ public class LoginUtil {
     static void handleResult(int requestCode, int resultCode, Intent data) {
         if (mLoginInstance != null) {
             mLoginInstance.handleResult(requestCode, resultCode, data);
+        }
+    }
+
+    public static int getPlatform() {
+        return mPlatform;
+    }
+
+    public static void onBackPressed() {
+        if (mLoginInstance instanceof InsLoginInstance) {
+            ((InsLoginInstance) mLoginInstance).onBackPressed();
         }
     }
 

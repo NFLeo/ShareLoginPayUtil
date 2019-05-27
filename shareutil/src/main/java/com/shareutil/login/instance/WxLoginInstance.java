@@ -48,20 +48,13 @@ public class WxLoginInstance extends LoginInstance {
     private static final String BASE_URL = "https://api.weixin.qq.com/sns/";
 
     private IWXAPI mIWXAPI;
-
-    private LoginListener mLoginListener;
-
     private OkHttpClient mClient;
-
-    private boolean fetchUserInfo;
 
     public WxLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mLoginListener = listener;
         mIWXAPI = WXAPIFactory.createWXAPI(activity, ShareManager.CONFIG.getWxId());
-
         mClient = new OkHttpClient();
-        this.fetchUserInfo = fetchUserInfo;
     }
 
     @Override
@@ -81,7 +74,7 @@ public class WxLoginInstance extends LoginInstance {
                 try {
                     Response response = mClient.newCall(request).execute();
                     JSONObject jsonObject = new JSONObject(response.body().string());
-                    WxToken token = WxToken.parse(jsonObject);
+                    WxToken token = new WxToken(jsonObject);
                     wxTokenEmitter.onNext(token);
                 } catch (IOException | JSONException e) {
                     wxTokenEmitter.onError(e);
@@ -93,7 +86,7 @@ public class WxLoginInstance extends LoginInstance {
                 .subscribe(new Consumer<WxToken>() {
                     @Override
                     public void accept(@NonNull WxToken wxToken) {
-                        if (fetchUserInfo) {
+                        if (mFetchUserInfo) {
                             mLoginListener.beforeFetchUserInfo(wxToken);
                             fetchUserInfo(wxToken);
                         } else {
@@ -199,10 +192,7 @@ public class WxLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
-        if (mSubscribe != null && !mSubscribe.isDisposed()) {
-            mSubscribe.dispose();
-            mSubscribe = null;
-        }
+        super.recycle();
         if (mTokenSubscribe != null && !mTokenSubscribe.isDisposed()) {
             mTokenSubscribe.dispose();
             mTokenSubscribe = null;
@@ -211,6 +201,8 @@ public class WxLoginInstance extends LoginInstance {
             mIWXAPI.detach();
             mIWXAPI = null;
         }
+
+        mClient = null;
     }
 
     private String buildTokenUrl(String code) {

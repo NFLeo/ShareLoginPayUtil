@@ -53,7 +53,9 @@ dependencies {
     })
     implementation project(':shareutil')
 //    implementation 'com.nfleo:ShareLoginPayUtil:1.0.2'
-    implementation 'me.shaohui:bottomdialog:1.1.9'
+    implementation ('me.shaohui:bottomdialog:1.1.9') {
+        exclude module: 'support-v4'
+    }
     implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
     implementation 'com.android.support.constraint:constraint-layout:2.0.0-alpha1'
     testImplementation 'junit:junit:4.12'

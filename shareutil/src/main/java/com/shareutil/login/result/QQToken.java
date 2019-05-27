@@ -5,11 +5,18 @@ import org.json.JSONObject;
 
 public class QQToken extends BaseToken {
 
-    public static QQToken parse(JSONObject jsonObject) throws JSONException {
-        QQToken token = new QQToken();
-        token.setAccessToken(jsonObject.getString("access_token"));
-        token.setOpenid(jsonObject.getString("openid"));
-        return token;
-    }
+    public QQToken(JSONObject jsonObject) throws JSONException {
 
+        if (jsonObject == null) {
+            return;
+        }
+
+        if (jsonObject.has("access_token")) {
+            setAccessToken(jsonObject.getString("access_token"));
+        }
+
+        if (jsonObject.has("openid")) {
+            setOpenid(jsonObject.getString("openid"));
+        }
+    }
 }

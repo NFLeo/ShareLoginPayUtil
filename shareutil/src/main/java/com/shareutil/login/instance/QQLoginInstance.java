@@ -48,19 +48,16 @@ public class QQLoginInstance extends LoginInstance {
 
     private IUiListener mIUiListener;
 
-    private LoginListener mLoginListener;
-
     public QQLoginInstance(Activity activity, final LoginListener listener,
                            final boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
         mTencent = Tencent.createInstance(ShareManager.CONFIG.getQqId(), activity);
-        mLoginListener = listener;
         mIUiListener = new IUiListener() {
             @Override
             public void onComplete(Object o) {
                 ShareLogger.i(ShareLogger.INFO.QQ_AUTH_SUCCESS);
                 try {
-                    QQToken token = QQToken.parse((JSONObject) o);
+                    QQToken token = new QQToken((JSONObject) o);
                     if (fetchUserInfo) {
                         listener.beforeFetchUserInfo(token);
                         fetchUserInfo(token);
@@ -170,13 +167,9 @@ public class QQLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
-        if (mSubscribe != null && !mSubscribe.isDisposed()) {
-            mSubscribe.dispose();
-            mSubscribe = null;
-        }
+        super.recycle();
         mTencent.releaseResource();
         mIUiListener = null;
-        mLoginListener = null;
         mTencent = null;
     }
 }

@@ -11,9 +11,15 @@ import io.reactivex.disposables.Disposable;
 
 public abstract class LoginInstance {
 
+    LoginListener mLoginListener;
+    Activity mActivity;
     Disposable mSubscribe;
+    boolean mFetchUserInfo;
 
     LoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
+        mActivity = activity;
+        mLoginListener = listener;
+        mFetchUserInfo = fetchUserInfo;
     }
 
     public abstract void doLogin(Activity activity, LoginListener listener, boolean fetchUserInfo);
@@ -24,5 +30,13 @@ public abstract class LoginInstance {
 
     public abstract boolean isInstall(Context context);
 
-    public abstract void recycle();
+    public void recycle() {
+        if (mSubscribe != null && !mSubscribe.isDisposed()) {
+            mSubscribe.dispose();
+            mSubscribe = null;
+        }
+
+        mLoginListener = null;
+        mActivity = null;
+    }
 }

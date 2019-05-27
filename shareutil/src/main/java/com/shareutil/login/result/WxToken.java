@@ -7,12 +7,21 @@ public class WxToken extends BaseToken {
 
     private String refresh_token;
 
-    public static WxToken parse(JSONObject jsonObject) throws JSONException {
-        WxToken wxToken = new WxToken();
-        wxToken.setOpenid(jsonObject.getString("openid"));
-        wxToken.setAccessToken(jsonObject.getString("access_token"));
-        wxToken.setRefreshToken(jsonObject.getString("refresh_token"));
-        return wxToken;
+    public WxToken(JSONObject jsonObject) throws JSONException {
+
+        if (jsonObject == null) {
+            return;
+        }
+
+        if (jsonObject.has("openid")) {
+            setOpenid(jsonObject.getString("openid"));
+        }
+        if (jsonObject.has("access_token")) {
+            setAccessToken(jsonObject.getString("access_token"));
+        }
+        if (jsonObject.has("refresh_token")) {
+            setRefreshToken(jsonObject.getString("refresh_token"));
+        }
     }
 
     public String getRefreshToken() {

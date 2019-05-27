@@ -8,13 +8,14 @@ public class WeiboToken extends BaseToken {
 
     private String phoneNum;
 
-    public static WeiboToken parse(Oauth2AccessToken token) {
-        WeiboToken target = new WeiboToken();
-        target.setOpenid(token.getUid());
-        target.setAccessToken(token.getToken());
-        target.setRefreshToken(token.getRefreshToken());
-        target.setPhoneNum(token.getPhoneNum());
-        return target;
+    public WeiboToken(Oauth2AccessToken token) {
+        if (token == null) {
+            return;
+        }
+        setOpenid(token.getUid());
+        setAccessToken(token.getToken());
+        setRefreshToken(token.getRefreshToken());
+        setPhoneNum(token.getPhoneNum());
     }
 
     public String getRefreshToken() {

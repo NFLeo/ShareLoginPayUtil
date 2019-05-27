@@ -10,15 +10,17 @@ import java.lang.annotation.Target;
 public class LoginPlatform {
 
     @Documented
-    @IntDef({QQ, WX, WEIBO})
+    @IntDef({QQ, WX, WEIBO, INS})
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.PARAMETER)
     public @interface Platform {
     }
 
-    public static final int QQ = 1;
+    public static final int QQ = 0X0071;
 
-    public static final int WX = 3;
+    public static final int WX = 0X0073;
 
-    public static final int WEIBO = 5;
+    public static final int WEIBO = 0X0075;
+
+    public static final int INS = 0X0077;
 }
