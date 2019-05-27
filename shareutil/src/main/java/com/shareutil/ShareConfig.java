@@ -18,6 +18,8 @@ public class ShareConfig {
 
     private String insScope;
 
+    private String redirectURIs;
+
     private boolean debug;
 
     public static ShareConfig instance() {
@@ -52,6 +54,10 @@ public class ShareConfig {
     public ShareConfig weiboScope(String scope) {
         weiboScope = scope;
         return this;
+    }
+
+    public void redirectURIs(String redirectURIs) {
+        this.redirectURIs = redirectURIs;
     }
 
     public ShareConfig debug(boolean isDebug) {
@@ -97,6 +103,10 @@ public class ShareConfig {
 
     public void insScope(String insScope) {
         this.insScope = insScope;
+    }
+
+    public String getRedirectURIs() {
+        return redirectURIs;
     }
 
     public boolean isDebug() {

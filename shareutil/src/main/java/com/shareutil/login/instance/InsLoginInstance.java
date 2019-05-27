@@ -57,10 +57,10 @@ public class InsLoginInstance extends LoginInstance {
 
     public static final String sAuthorizationUrl = "https://api.instagram.com/oauth/authorize";
     public static final String sTokenUrl = "https://api.instagram.com/oauth/access_token";
-    public static final String redirectURIs = "http://www.funplanet.cn/";
 
     private String mClientId;
     private String mClientSecret;
+    private String mRedirectURIs;
     private WebView mWebView;
     private FrameLayout webParentView;
 
@@ -68,6 +68,7 @@ public class InsLoginInstance extends LoginInstance {
         super(activity, listener, fetchUserInfo);
         mClientId = ShareConfig.instance().getInsClientId();
         mClientSecret = ShareConfig.instance().getInsScope();
+        mRedirectURIs = ShareConfig.instance().getRedirectURIs();
         mLoginListener = listener;
     }
 
@@ -108,7 +109,7 @@ public class InsLoginInstance extends LoginInstance {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                if (url.startsWith(redirectURIs)) {
+                if (url.startsWith(mRedirectURIs)) {
                     InsToken token = new InsToken(url);
                     if (fetchUserInfo) {
                         listener.beforeFetchUserInfo(token);
@@ -165,7 +166,7 @@ public class InsLoginInstance extends LoginInstance {
                 dialog.show();
             }
         });
-        mWebView.loadUrl(sAuthorizationUrl + "?client_id=" + mClientId + "&response_type=code&redirect_uri=" + redirectURIs);
+        mWebView.loadUrl(sAuthorizationUrl + "?client_id=" + mClientId + "&response_type=code&redirect_uri=" + mRedirectURIs);
 
         View decorView = activity.getWindow().getDecorView();
         webParentView = decorView.findViewById(R.id.id_share_container);
@@ -256,7 +257,7 @@ public class InsLoginInstance extends LoginInstance {
         builder.add("client_id", mClientId);
         builder.add("client_secret", mClientSecret);
         builder.add("grant_type", "authorization_code");
-        builder.add("redirect_uri", redirectURIs);
+        builder.add("redirect_uri", mRedirectURIs);
         builder.add("code", token.getAccessToken());
         return builder.build();
     }
