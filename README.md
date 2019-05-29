@@ -14,6 +14,12 @@
 - 支持视频分享
 
 ## ChangeLog
+
+#### 2019-05-29
+- 添加并测试成功Instagram登录
+- 添加并测试成功FaceBook登录
+- 添加并测试成功Google登录
+
 #### 2019-05-23
 - 更新支付宝支付（修改为aar依赖方式）
 - 去除登录、分享、支付所产生的内存泄漏
@@ -84,8 +90,11 @@
     defaultConfig {
         ...
         // 必须配置qqid 否则无法获取分享成功回调
+        // 注：以下三个参数均为占位，里面的值随意
         manifestPlaceholders = [
                 qq_id: "1106618327"
+                FACEBOOK_APP_ID: "1106618327",
+                FACEBOOK_SCHEME: "1106618327"
         ]
         ...
     }
