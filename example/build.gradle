@@ -21,7 +21,9 @@ android {
         versionName "1.0"
 
         manifestPlaceholders = [
-                qq_id: "1106618327"
+                qq_id: "1106618327",
+                FACEBOOK_APP_ID: "1106618327",
+                FACEBOOK_SCHEME: "1106618327"
         ]
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -57,7 +59,7 @@ dependencies {
         exclude module: 'support-v4'
     }
     implementation "com.android.support:appcompat-v7:$rootProject.ext.supportVersion"
-    implementation 'com.android.support.constraint:constraint-layout:2.0.0-alpha1'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.0-beta1'
     testImplementation 'junit:junit:4.12'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.3'

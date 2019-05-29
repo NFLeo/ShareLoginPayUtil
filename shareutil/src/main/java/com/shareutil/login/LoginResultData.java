@@ -3,7 +3,7 @@ package com.shareutil.login;
 import com.shareutil.login.result.BaseToken;
 import com.shareutil.login.result.BaseUser;
 
-public class LoginResult {
+public class LoginResultData {
 
     private BaseToken mToken;
 
@@ -11,12 +11,12 @@ public class LoginResult {
 
     private int mPlatform;
 
-    public LoginResult(int platform, BaseToken token) {
+    public LoginResultData(int platform, BaseToken token) {
         mPlatform = platform;
         mToken = token;
     }
 
-    public LoginResult(int platform, BaseToken token, BaseUser userInfo) {
+    public LoginResultData(int platform, BaseToken token, BaseUser userInfo) {
         mPlatform = platform;
         mToken = token;
         mUserInfo = userInfo;

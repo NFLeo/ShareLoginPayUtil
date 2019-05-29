@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.shareutil.LoginUtil;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
-import com.shareutil.login.LoginResult;
+import com.shareutil.login.LoginResultData;
 
 import me.shaohui.bottomdialog.BaseBottomDialog;
 
@@ -32,9 +32,9 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_qq:
-                LoginUtil.login(getContext(), LoginPlatform.QQ, new LoginListener() {
+                LoginUtil.login(getContext(), LoginPlatform.INS, new LoginListener() {
                     @Override
-                    public void loginSuccess(LoginResult result) {
+                    public void loginSuccess(LoginResultData result) {
                         Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -50,9 +50,9 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
                 });
                 break;
             case R.id.share_weibo:
-                LoginUtil.login(getContext(), LoginPlatform.WEIBO, new LoginListener() {
+                LoginUtil.login(getContext(), LoginPlatform.FACEBOOK, new LoginListener() {
                     @Override
-                    public void loginSuccess(LoginResult result) {
+                    public void loginSuccess(LoginResultData result) {
                         Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -68,9 +68,9 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
                 });
                 break;
             case R.id.share_wx:
-                LoginUtil.login(getContext(), LoginPlatform.WX, new LoginListener() {
+                LoginUtil.login(getContext(), LoginPlatform.GOOGLE, new LoginListener() {
                     @Override
-                    public void loginSuccess(LoginResult result) {
+                    public void loginSuccess(LoginResultData result) {
                         Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
                     }
 
@@ -88,5 +88,11 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
         }
 
         dismiss();
+    }
+
+    @Override
+    public void dismiss() {
+        LoginUtil.recycle();
+        super.dismiss();
     }
 }

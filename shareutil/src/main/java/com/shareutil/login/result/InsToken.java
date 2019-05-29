@@ -1,5 +1,7 @@
 package com.shareutil.login.result;
 
+import android.text.TextUtils;
+
 public class InsToken extends BaseToken {
 
     private String code;
@@ -14,12 +16,13 @@ public class InsToken extends BaseToken {
                 String[] keyValue = param.split("[=]");
                 if (keyValue[0].equals("code")) {
                     code = keyValue[1];
+                    setOpenid(code);
                 }
             }
         }
     }
 
     public String getCode() {
-        return code;
+        return TextUtils.isEmpty(code) ? "" : code;
     }
 }

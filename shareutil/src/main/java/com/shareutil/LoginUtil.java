@@ -6,6 +6,8 @@ import android.content.Intent;
 
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
+import com.shareutil.login.instance.FBLoginInstance;
+import com.shareutil.login.instance.GoogleLoginInstance;
 import com.shareutil.login.instance.InsLoginInstance;
 import com.shareutil.login.instance.LoginInstance;
 import com.shareutil.login.instance.QQLoginInstance;
@@ -53,6 +55,15 @@ public class LoginUtil {
                     activity.finish();
                     return;
                 }
+                break;
+            case LoginPlatform.INS:
+                mLoginInstance = new InsLoginInstance(activity, mLoginListener, isFetchUserInfo);
+                break;
+            case LoginPlatform.FACEBOOK:
+                mLoginInstance = new FBLoginInstance(activity, mLoginListener, isFetchUserInfo);
+                break;
+            case LoginPlatform.GOOGLE:
+                mLoginInstance = new GoogleLoginInstance(activity, mLoginListener, isFetchUserInfo);
                 break;
             default:
                 mLoginListener.loginFailure(new Exception(ShareLogger.INFO.UNKNOW_PLATFORM), ShareLogger.INFO.UNKNOW_PLATFORM_CODE);

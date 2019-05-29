@@ -18,7 +18,15 @@ public class ShareConfig {
 
     private String insScope;
 
-    private String redirectURIs;
+    private String insRedirectURIs;
+
+    private String googleClientId;
+
+    private String googleClientSecret;
+
+    private String fbClientId;
+
+    private String fbClientScheme;
 
     private boolean debug;
 
@@ -56,8 +64,39 @@ public class ShareConfig {
         return this;
     }
 
-    public void redirectURIs(String redirectURIs) {
-        this.redirectURIs = redirectURIs;
+    public ShareConfig insRedirectURIs(String redirectURIs) {
+        this.insRedirectURIs = redirectURIs;
+        return this;
+    }
+
+    public ShareConfig insClientId(String insClientId) {
+        this.insClientId = insClientId;
+        return this;
+    }
+
+    public ShareConfig insScope(String insScope) {
+        this.insScope = insScope;
+        return this;
+    }
+
+    public ShareConfig googleClientId(String googleClientId) {
+        this.googleClientId = googleClientId;
+        return this;
+    }
+
+    public ShareConfig googleClientSecret(String googleClientSecret) {
+        this.googleClientSecret = googleClientSecret;
+        return this;
+    }
+
+    public ShareConfig fbClientId(String fbClientId) {
+        this.fbClientId = fbClientId;
+        return this;
+    }
+
+    public ShareConfig fbClientScheme(String fbClientScheme) {
+        this.fbClientScheme = fbClientScheme;
+        return this;
     }
 
     public ShareConfig debug(boolean isDebug) {
@@ -93,20 +132,28 @@ public class ShareConfig {
         return insClientId;
     }
 
-    public void insClientId(String insClientId) {
-        this.insClientId = insClientId;
-    }
-
     public String getInsScope() {
         return insScope;
     }
 
-    public void insScope(String insScope) {
-        this.insScope = insScope;
+    public String getInsRedirectURIs() {
+        return insRedirectURIs;
     }
 
-    public String getRedirectURIs() {
-        return redirectURIs;
+    public String getGoogleClientId() {
+        return googleClientId;
+    }
+
+    public String getGoogleClientSecret() {
+        return googleClientSecret;
+    }
+
+    public String getFbClientId() {
+        return fbClientId;
+    }
+
+    public String getFbClientScheme() {
+        return fbClientScheme;
     }
 
     public boolean isDebug() {

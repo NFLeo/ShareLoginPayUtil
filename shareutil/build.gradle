@@ -31,12 +31,6 @@ android {
     lintOptions {
         abortOnError false
     }
-
-//    repositories {
-//        flatDir {
-//            dirs 'libs'
-//        }
-//    }
 }
 
 dependencies {
@@ -54,7 +48,7 @@ dependencies {
     implementation (name: 'alipaySdk-15.6.2-20190416165036', ext: 'aar')
 
     implementation 'com.facebook.android:facebook-login:4.33.0'
-//    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
 }
 
 tasks.withType(JavaCompile) {

@@ -13,7 +13,7 @@ import com.shareutil.ShareLogger;
 import com.shareutil.ShareManager;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
-import com.shareutil.login.LoginResult;
+import com.shareutil.login.LoginResultData;
 import com.shareutil.login.result.BaseToken;
 import com.shareutil.login.result.QQToken;
 import com.shareutil.login.result.QQUser;
@@ -39,6 +39,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+/**
+ * Describe : QQ登录
+ * Created by Leo on 2018/6/27.
+ */
 public class QQLoginInstance extends LoginInstance {
 
     private static final String SCOPE = "get_simple_userinfo";
@@ -62,7 +66,7 @@ public class QQLoginInstance extends LoginInstance {
                         listener.beforeFetchUserInfo(token);
                         fetchUserInfo(token);
                     } else {
-                        listener.loginSuccess(new LoginResult(LoginPlatform.QQ, token));
+                        listener.loginSuccess(new LoginResultData(LoginPlatform.QQ, token));
                         LoginUtil.recycle();
                     }
                 } catch (JSONException e) {
@@ -74,7 +78,7 @@ public class QQLoginInstance extends LoginInstance {
 
             @Override
             public void onError(UiError uiError) {
-                ShareLogger.i(ShareLogger.INFO.QQ_LOGIN_ERROR);
+                ShareLogger.i(ShareLogger.INFO.LOGIN_ERROR);
                 listener.loginFailure(new Exception(uiError.errorDetail), uiError.errorCode);
                 LoginUtil.recycle();
             }
@@ -91,8 +95,8 @@ public class QQLoginInstance extends LoginInstance {
     @Override
     public void doLogin(Activity activity, final LoginListener listener, boolean fetchUserInfo) {
         if (mTencent == null || mIUiListener == null) {
-            ShareLogger.i(ShareLogger.INFO.QQ_LOGIN_ERROR);
-            listener.loginFailure(new Exception(ShareLogger.INFO.QQ_LOGIN_ERROR), -1);
+            ShareLogger.i(ShareLogger.INFO.LOGIN_ERROR);
+            listener.loginFailure(new Exception(ShareLogger.INFO.LOGIN_ERROR), -1);
             LoginUtil.recycle();
             return;
         }
@@ -114,6 +118,7 @@ public class QQLoginInstance extends LoginInstance {
                     JSONObject jsonObject = new JSONObject(response.body().string());
                     QQUser user = QQUser.parse(token.getOpenid(), jsonObject);
                     qqUserEmitter.onNext(user);
+                    qqUserEmitter.onComplete();
                 } catch (IOException | JSONException e) {
                     ShareLogger.e(ShareLogger.INFO.FETCH_USER_INOF_ERROR);
                     qqUserEmitter.onError(e);
@@ -126,7 +131,7 @@ public class QQLoginInstance extends LoginInstance {
                     @Override
                     public void accept(@NonNull QQUser qqUser) {
                         mLoginListener.loginSuccess(
-                                new LoginResult(LoginPlatform.QQ, token, qqUser));
+                                new LoginResultData(LoginPlatform.QQ, token, qqUser));
                         LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {

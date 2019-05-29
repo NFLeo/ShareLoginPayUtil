@@ -2,17 +2,16 @@ package com.shareutil.login.result;
 
 public class BaseUser {
 
+    private String openId;
+
+    private String nickname;
+
     /**
      * sex
      * 0. 未知
      * 1. 男
      * 2. 女
      */
-
-    private String openId;
-
-    private String nickname;
-
     private int sex;
 
     private String headImageUrl;

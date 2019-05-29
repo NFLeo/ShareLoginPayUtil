@@ -9,7 +9,7 @@ import com.shareutil.LoginUtil;
 import com.shareutil.ShareLogger;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
-import com.shareutil.login.LoginResult;
+import com.shareutil.login.LoginResultData;
 import com.shareutil.login.result.BaseToken;
 import com.shareutil.login.result.WeiboToken;
 import com.shareutil.login.result.WeiboUser;
@@ -39,7 +39,7 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 /**
- * Describe :
+ * Describe : 微博登录
  * Created by Leo on 2018/6/22.
  */
 public class WeiboLoginInstance extends LoginInstance {
@@ -80,7 +80,7 @@ public class WeiboLoginInstance extends LoginInstance {
                 mLoginListener.beforeFetchUserInfo(weiboToken);
                 fetchUserInfo(weiboToken);
             } else {
-                mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WEIBO, weiboToken));
+                mLoginListener.loginSuccess(new LoginResultData(LoginPlatform.WEIBO, weiboToken));
                 LoginUtil.recycle();
             }
         }
@@ -96,7 +96,7 @@ public class WeiboLoginInstance extends LoginInstance {
         @Override
         public void onFailure(WbConnectErrorMessage errorMessage) {
             if (mLoginListener != null) {
-                mLoginListener.loginFailure(new Exception(errorMessage.getErrorMessage()), ShareLogger.INFO.ERR_WEIBO_AUTH_CODE);
+                mLoginListener.loginFailure(new Exception(errorMessage.getErrorMessage()), ShareLogger.INFO.ERR_AUTH_CODE);
                 LoginUtil.recycle();
             }
         }
@@ -105,7 +105,7 @@ public class WeiboLoginInstance extends LoginInstance {
     @Override
     public void doLogin(Activity activity, final LoginListener listener, final boolean fetchUserInfo) {
         if (mSsoHandler == null) {
-            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WEIBO_LOGIN_ERROR), ShareLogger.INFO.ERR_WEIBO_AUTH_CODE);
+            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.LOGIN_ERROR), ShareLogger.INFO.ERR_AUTH_CODE);
             LoginUtil.recycle();
             return;
         }
@@ -126,6 +126,7 @@ public class WeiboLoginInstance extends LoginInstance {
                     JSONObject jsonObject = new JSONObject(response.body().string());
                     WeiboUser user = WeiboUser.parse(jsonObject);
                     weiboUserEmitter.onNext(user);
+                    weiboUserEmitter.onComplete();
                 } catch (IOException | JSONException e) {
                     ShareLogger.e(ShareLogger.INFO.FETCH_USER_INOF_ERROR);
                     weiboUserEmitter.onError(e);
@@ -138,7 +139,7 @@ public class WeiboLoginInstance extends LoginInstance {
                     @Override
                     public void accept(@NonNull WeiboUser weiboUser) throws Exception {
                         mLoginListener.loginSuccess(
-                                new LoginResult(LoginPlatform.WEIBO, token, weiboUser));
+                                new LoginResultData(LoginPlatform.WEIBO, token, weiboUser));
                         LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {

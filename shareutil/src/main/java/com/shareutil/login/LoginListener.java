@@ -4,7 +4,7 @@ import com.shareutil.login.result.BaseToken;
 
 public abstract class LoginListener {
 
-    public abstract void loginSuccess(LoginResult result);
+    public abstract void loginSuccess(LoginResultData result);
 
     public void beforeFetchUserInfo(BaseToken token) {
     }

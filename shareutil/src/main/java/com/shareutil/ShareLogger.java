@@ -39,11 +39,9 @@ public class ShareLogger {
         public static final String LOGIN_CANCEL = "call login cancel";
         public static final String LOGIN_AUTH_SUCCESS = "call before fetch user info";
         public static final String ILLEGAL_TOKEN = "Illegal token, please check your config";
-        public static final String WX_LOGIN_ERROR = "WX login error";
-        public static final String QQ_LOGIN_ERROR = "QQ login error";
+        public static final String LOGIN_ERROR = "login error";
         public static final String QQ_AUTH_SUCCESS = "QQ auth success";
         public static final String WEIBO_AUTH_ERROR = "weibo auth error";
-        public static final String WEIBO_LOGIN_ERROR = "weibo login error";
         public static final String UNKNOW_PLATFORM = "unknown platform";
 
         // for login error code
@@ -51,21 +49,21 @@ public class ShareLogger {
         public static final int UNKNOW_PLATFORM_CODE = 222;
         public static final int ERR_GET_TOKEN_CODE = 333;
         public static final int ERR_FETCH_CODE = 444;
-        public static final int WX_ERR_SENT_FAILED_CODE = 555;
-        public static final int WX_ERR_UNSUPPORT_CODE = 666;
-        public static final int WX_ERR_AUTH_DENIED_CODE = 777;
-        public static final int WX_ERR_AUTH_ERROR_CODE = 888;
-        public static final int ERR_WEIBO_AUTH_CODE = 999;
+        public static final int ERR_SENT_FAILED_CODE = 555;
+        public static final int ERR_UNSUPPORT_CODE = 666;
+        public static final int ERR_AUTH_DENIED_CODE = 777;
+        public static final int ERR_AUTH_ERROR_CODE = 888;
+        public static final int ERR_AUTH_CODE = 999;
 
         // for pay
         public static final String PAY_SUCCESS = "call pay success";
         public static final String PAY_FAILED = "call pay failed";
         public static final String PAY_CANCEL = "call pay cancel";
 
-        public static final String WX_ERR_SENT_FAILED = "Wx sent failed";
-        public static final String WX_ERR_UNSUPPORT = "Wx UnSupport";
-        public static final String WX_ERR_AUTH_DENIED = "Wx auth denied";
-        public static final String WX_ERR_AUTH_ERROR = "Wx auth error";
+        public static final String ERR_SENT_FAILED = "sent failed";
+        public static final String ERR_UNSUPPORT = "UnSupport";
+        public static final String ERR_AUTH_DENIED = "auth denied";
+        public static final String ERR_AUTH_ERROR = "auth error";
 
         public static final String AUTH_CANCEL = "auth cancel";
         public static final String FETCH_USER_INOF_ERROR = "Fetch user info error";

@@ -24,7 +24,10 @@ public class MainActivity extends AppCompatActivity {
         findViewBy();
         setListener();
         ShareConfig config = ShareConfig.instance().qqId("1106618327")
-                .weiboId("1712559958")
+                .weiboId("1712559958").debug(true)
+                .googleClientId("1231231").googleClientSecret("asdasd")
+                .insClientId("1231231").insScope("asdsd").insRedirectURIs("111")
+                .fbClientId("1231231").fbClientScheme("asdsd")
                 .wxId(APP_ID).wxSecret(APP_SECRET);
         ShareManager.init(config);
     }

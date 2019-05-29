@@ -21,11 +21,11 @@ import android.widget.FrameLayout;
 
 import com.shareutil.LoginUtil;
 import com.shareutil.R;
-import com.shareutil.ShareConfig;
 import com.shareutil.ShareLogger;
+import com.shareutil.ShareManager;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
-import com.shareutil.login.LoginResult;
+import com.shareutil.login.LoginResultData;
 import com.shareutil.login.result.BaseToken;
 import com.shareutil.login.result.InsToken;
 import com.shareutil.login.result.InsUser;
@@ -64,12 +64,13 @@ public class InsLoginInstance extends LoginInstance {
     private WebView mWebView;
     private FrameLayout webParentView;
 
-    InsLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
+    public InsLoginInstance(Activity activity, LoginListener listener, boolean fetchUserInfo) {
         super(activity, listener, fetchUserInfo);
-        mClientId = ShareConfig.instance().getInsClientId();
-        mClientSecret = ShareConfig.instance().getInsScope();
-        mRedirectURIs = ShareConfig.instance().getRedirectURIs();
+        mClientId = ShareManager.CONFIG.getInsClientId();
+        mClientSecret = ShareManager.CONFIG.getInsScope();
+        mRedirectURIs = ShareManager.CONFIG.getInsRedirectURIs();
         mLoginListener = listener;
+        mClient = new OkHttpClient.Builder().build();
     }
 
     @Override
@@ -97,7 +98,6 @@ public class InsLoginInstance extends LoginInstance {
             @Override
             public void onProgressChanged(WebView view, int newProgress) {
                 super.onProgressChanged(view, newProgress);
-
             }
 
             @Override
@@ -109,13 +109,16 @@ public class InsLoginInstance extends LoginInstance {
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                ShareLogger.i("ins doLogin");
+                ShareLogger.i(url);
                 if (url.startsWith(mRedirectURIs)) {
                     InsToken token = new InsToken(url);
+                    ShareLogger.i(ShareLogger.INFO.LOGIN_AUTH_SUCCESS);
                     if (fetchUserInfo) {
                         listener.beforeFetchUserInfo(token);
                         fetchUserInfo(token);
                     } else {
-                        listener.loginSuccess(new LoginResult(LoginPlatform.INS, token));
+                        listener.loginSuccess(new LoginResultData(LoginPlatform.INS, token));
                         LoginUtil.recycle();
                     }
 
@@ -128,7 +131,6 @@ public class InsLoginInstance extends LoginInstance {
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
             }
-
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -166,7 +168,7 @@ public class InsLoginInstance extends LoginInstance {
                 dialog.show();
             }
         });
-        mWebView.loadUrl(sAuthorizationUrl + "?client_id=" + mClientId + "&response_type=code&redirect_uri=" + mRedirectURIs);
+        mWebView.loadUrl(buildAuthUrl());
 
         View decorView = activity.getWindow().getDecorView();
         webParentView = decorView.findViewById(R.id.id_share_container);
@@ -186,10 +188,12 @@ public class InsLoginInstance extends LoginInstance {
 
                 Request post = new Request.Builder().url(sTokenUrl).post(buildUserInfoUrl(token)).build();
                 try {
-                    Response response = new OkHttpClient().newCall(post).execute();
+                    Response response = mClient.newCall(post).execute();
                     JSONObject jsonObject = new JSONObject(response.body().string());
+                    ShareLogger.i("auth:" + jsonObject.toString());
                     InsUser user = new InsUser(jsonObject);
                     insUserEmitter.onNext(user);
+                    insUserEmitter.onComplete();
                 } catch (IOException | JSONException e) {
                     insUserEmitter.onError(e);
                 }
@@ -200,7 +204,7 @@ public class InsLoginInstance extends LoginInstance {
                 .subscribe(new Consumer<InsUser>() {
                     @Override
                     public void accept(@NonNull InsUser insUser) {
-                        mLoginListener.loginSuccess(new LoginResult(LoginPlatform.INS, token, insUser));
+                        mLoginListener.loginSuccess(new LoginResultData(LoginPlatform.INS, token, insUser));
                         LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {
@@ -223,7 +227,6 @@ public class InsLoginInstance extends LoginInstance {
 
     @Override
     public void recycle() {
-        super.recycle();
 
         //清空所有Cookie
         CookieSyncManager.createInstance(mActivity);  //Create a singleton CookieSyncManager within a context
@@ -240,6 +243,7 @@ public class InsLoginInstance extends LoginInstance {
         mWebView = null;
         mClientSecret = null;
         mClientId = null;
+        super.recycle();
     }
 
     public void onBackPressed() {
@@ -252,13 +256,19 @@ public class InsLoginInstance extends LoginInstance {
         }
     }
 
+    private String buildAuthUrl() {
+        return sAuthorizationUrl + "?client_id=" + mClientId
+                + "&response_type=code"
+                + "&redirect_uri=" + mRedirectURIs;
+    }
+
     private RequestBody buildUserInfoUrl(BaseToken token) {
         FormBody.Builder builder = new FormBody.Builder();
         builder.add("client_id", mClientId);
         builder.add("client_secret", mClientSecret);
         builder.add("grant_type", "authorization_code");
         builder.add("redirect_uri", mRedirectURIs);
-        builder.add("code", token.getAccessToken());
+        builder.add("code", ((InsToken) token).getCode());
         return builder.build();
     }
 }

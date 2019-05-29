@@ -10,7 +10,7 @@ import com.shareutil.ShareLogger;
 import com.shareutil.ShareManager;
 import com.shareutil.login.LoginListener;
 import com.shareutil.login.LoginPlatform;
-import com.shareutil.login.LoginResult;
+import com.shareutil.login.LoginResultData;
 import com.shareutil.login.result.BaseToken;
 import com.shareutil.login.result.WxToken;
 import com.shareutil.login.result.WxUser;
@@ -39,10 +39,13 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+ /**
+  * Describe : 微信登录
+  * Created by Leo on 2018/6/27.
+  */
 public class WxLoginInstance extends LoginInstance {
 
     private static final String SCOPE_USER_INFO = "snsapi_userinfo";
-    private static final String SCOPE_BASE = "snsapi_base";
     private Disposable mTokenSubscribe;
 
     private static final String BASE_URL = "https://api.weixin.qq.com/sns/";
@@ -76,6 +79,7 @@ public class WxLoginInstance extends LoginInstance {
                     JSONObject jsonObject = new JSONObject(response.body().string());
                     WxToken token = new WxToken(jsonObject);
                     wxTokenEmitter.onNext(token);
+                    wxTokenEmitter.onComplete();
                 } catch (IOException | JSONException e) {
                     wxTokenEmitter.onError(e);
                 }
@@ -90,7 +94,7 @@ public class WxLoginInstance extends LoginInstance {
                             mLoginListener.beforeFetchUserInfo(wxToken);
                             fetchUserInfo(wxToken);
                         } else {
-                            mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, wxToken));
+                            mLoginListener.loginSuccess(new LoginResultData(LoginPlatform.WX, wxToken));
                             LoginUtil.recycle();
                         }
 
@@ -126,7 +130,7 @@ public class WxLoginInstance extends LoginInstance {
                 .subscribe(new Consumer<WxUser>() {
                     @Override
                     public void accept(@NonNull WxUser wxUser) {
-                        mLoginListener.loginSuccess(new LoginResult(LoginPlatform.WX, token, wxUser));
+                        mLoginListener.loginSuccess(new LoginResultData(LoginPlatform.WX, token, wxUser));
                         LoginUtil.recycle();
                     }
                 }, new Consumer<Throwable>() {
@@ -141,7 +145,7 @@ public class WxLoginInstance extends LoginInstance {
     @Override
     public void handleResult(int requestCode, int resultCode, Intent data) {
         if (mIWXAPI == null) {
-            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_LOGIN_ERROR), ShareLogger.INFO.WX_ERR_AUTH_ERROR_CODE);
+            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.LOGIN_ERROR), ShareLogger.INFO.ERR_AUTH_ERROR_CODE);
             LoginUtil.recycle();
             return;
         }
@@ -164,19 +168,19 @@ public class WxLoginInstance extends LoginInstance {
                             LoginUtil.recycle();
                             break;
                         case BaseResp.ErrCode.ERR_SENT_FAILED:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_SENT_FAILED), ShareLogger.INFO.WX_ERR_SENT_FAILED_CODE);
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.ERR_SENT_FAILED), ShareLogger.INFO.ERR_SENT_FAILED_CODE);
                             LoginUtil.recycle();
                             break;
                         case BaseResp.ErrCode.ERR_UNSUPPORT:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_UNSUPPORT), ShareLogger.INFO.WX_ERR_UNSUPPORT_CODE);
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.ERR_UNSUPPORT), ShareLogger.INFO.ERR_UNSUPPORT_CODE);
                             LoginUtil.recycle();
                             break;
                         case BaseResp.ErrCode.ERR_AUTH_DENIED:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_DENIED), ShareLogger.INFO.WX_ERR_AUTH_DENIED_CODE);
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.ERR_AUTH_DENIED), ShareLogger.INFO.ERR_AUTH_DENIED_CODE);
                             LoginUtil.recycle();
                             break;
                         default:
-                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.WX_ERR_AUTH_ERROR), ShareLogger.INFO.WX_ERR_AUTH_ERROR_CODE);
+                            mLoginListener.loginFailure(new Exception(ShareLogger.INFO.ERR_AUTH_ERROR), ShareLogger.INFO.ERR_AUTH_ERROR_CODE);
                             LoginUtil.recycle();
                             break;
                     }
