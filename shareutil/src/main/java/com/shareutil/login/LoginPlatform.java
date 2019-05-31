@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 public class LoginPlatform {
 
     @Documented
-    @IntDef({QQ, WX, WEIBO, INS, GOOGLE, FACEBOOK})
+    @IntDef({QQ, WX, WEIBO, INS, GOOGLE, FACEBOOK, TWITTER})
     @Retention(RetentionPolicy.SOURCE)
     @Target(ElementType.PARAMETER)
     public @interface Platform {
@@ -27,4 +27,6 @@ public class LoginPlatform {
     public static final int GOOGLE = 0X0079;
 
     public static final int FACEBOOK = 0X0081;
+
+    public static final int TWITTER = 0X0083;
 }

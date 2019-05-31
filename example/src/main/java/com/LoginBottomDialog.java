@@ -32,7 +32,7 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.share_qq:
-                LoginUtil.login(getContext(), LoginPlatform.INS, new LoginListener() {
+                LoginUtil.login(getContext(), LoginPlatform.TWITTER, new LoginListener() {
                     @Override
                     public void loginSuccess(LoginResultData result) {
                         Toast.makeText(mContext, "登陆成功 " + result.getUserInfo().getNickname(), Toast.LENGTH_SHORT).show();
@@ -86,8 +86,6 @@ public class LoginBottomDialog extends BaseBottomDialog implements View.OnClickL
                 });
                 break;
         }
-
-        dismiss();
     }
 
     @Override

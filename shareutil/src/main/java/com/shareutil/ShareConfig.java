@@ -28,6 +28,10 @@ public class ShareConfig {
 
     private String fbClientScheme;
 
+    private String twitterConsumerKey;
+
+    private String twitterConsumerSecret;
+
     private boolean debug;
 
     public static ShareConfig instance() {
@@ -99,6 +103,16 @@ public class ShareConfig {
         return this;
     }
 
+    public ShareConfig twitterConsumerKey(String twitterConsumerKey) {
+        this.twitterConsumerKey = twitterConsumerKey;
+        return this;
+    }
+
+    public ShareConfig twitterConsumerSecret(String twitterConsumerSecret) {
+        this.twitterConsumerSecret = twitterConsumerSecret;
+        return this;
+    }
+
     public ShareConfig debug(boolean isDebug) {
         debug = isDebug;
         return this;
@@ -154,6 +168,14 @@ public class ShareConfig {
 
     public String getFbClientScheme() {
         return fbClientScheme;
+    }
+
+    public String getTwitterConsumerKey() {
+        return twitterConsumerKey;
+    }
+
+    public String getTwitterConsumerSecret() {
+        return twitterConsumerSecret;
     }
 
     public boolean isDebug() {

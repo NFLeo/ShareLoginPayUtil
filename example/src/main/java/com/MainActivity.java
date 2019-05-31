@@ -25,6 +25,8 @@ public class MainActivity extends AppCompatActivity {
         setListener();
         ShareConfig config = ShareConfig.instance().qqId("1106618327")
                 .weiboId("1712559958").debug(true)
+                .twitterConsumerKey("123132312")
+                .twitterConsumerSecret("1231232131")
                 .googleClientId("1231231").googleClientSecret("asdasd")
                 .insClientId("1231231").insScope("asdsd").insRedirectURIs("111")
                 .fbClientId("1231231").fbClientScheme("asdsd")

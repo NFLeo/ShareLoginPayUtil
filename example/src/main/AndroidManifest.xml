@@ -14,14 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <!--<activity-->
-            <!--android:name="com.shareutil._ShareActivity"-->
-            <!--android:theme="@style/translucent" />-->
-
-        <!--<activity-alias-->
-            <!--android:name=".wxapi.WXEntryActivity"-->
-            <!--android:exported="true"-->
-            <!--android:targetActivity="com.shareutil._ShareActivity" />-->
 
         <activity android:name=".MainActivity">
             <intent-filter>

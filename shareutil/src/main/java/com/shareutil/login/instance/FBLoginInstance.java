@@ -69,8 +69,10 @@ public class FBLoginInstance extends LoginInstance {
                 FacebookToken faceBookToken = new FacebookToken(accessToken);
                 ShareLogger.i(ShareLogger.INFO.LOGIN_AUTH_SUCCESS);
                 if (mFetchUserInfo) {
+                    mLoginListener.beforeFetchUserInfo(faceBookToken);
                     fetchUserInfo(faceBookToken);
                 } else {
+                    mLoginListener.loginSuccess(new LoginResultData(LoginPlatform.FACEBOOK, faceBookToken));
                     LoginUtil.recycle();
                 }
             }

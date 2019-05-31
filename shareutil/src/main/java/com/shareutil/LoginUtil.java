@@ -11,6 +11,7 @@ import com.shareutil.login.instance.GoogleLoginInstance;
 import com.shareutil.login.instance.InsLoginInstance;
 import com.shareutil.login.instance.LoginInstance;
 import com.shareutil.login.instance.QQLoginInstance;
+import com.shareutil.login.instance.TwitterLoginInstance;
 import com.shareutil.login.instance.WeiboLoginInstance;
 import com.shareutil.login.instance.WxLoginInstance;
 
@@ -64,6 +65,9 @@ public class LoginUtil {
                 break;
             case LoginPlatform.GOOGLE:
                 mLoginInstance = new GoogleLoginInstance(activity, mLoginListener, isFetchUserInfo);
+                break;
+            case LoginPlatform.TWITTER:
+                mLoginInstance = new TwitterLoginInstance(activity, mLoginListener, isFetchUserInfo);
                 break;
             default:
                 mLoginListener.loginFailure(new Exception(ShareLogger.INFO.UNKNOW_PLATFORM), ShareLogger.INFO.UNKNOW_PLATFORM_CODE);

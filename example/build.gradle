@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -23,9 +24,11 @@ android {
         manifestPlaceholders = [
                 qq_id: "1106618327",
                 FACEBOOK_APP_ID: "1106618327",
-                FACEBOOK_SCHEME: "1106618327"
+                FACEBOOK_SCHEME: "1106618327",
+                FABRIC_API_KEY: "6fec91d47baf8c2b255515383bfb34edd8bb987f"
         ]
 
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -48,8 +51,14 @@ android {
     }
 }
 
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://maven.fabric.io/public'
+    }
+}
+
 dependencies {
-//    implementation fileTree(include: ['*.jar'], dir: 'libs')
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -66,6 +75,8 @@ dependencies {
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.3'
     // Optional, if you use support library fragments:
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.3'
+
+    implementation 'com.android.support:multidex:1.0.3'
 }
 
 tasks.withType(JavaCompile) {
