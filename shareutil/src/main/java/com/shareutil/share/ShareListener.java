@@ -20,12 +20,11 @@ public abstract class ShareListener implements IUiListener {
         shareCancel();
     }
 
+    public abstract void shareStart();
+
     public abstract void shareSuccess();
 
     public abstract void shareFailure(Exception e);
 
     public abstract void shareCancel();
-
-    // 用于缓解用户焦虑
-    public void shareRequest() { }
 }

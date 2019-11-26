@@ -30,8 +30,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 /**
- * Describe :
- * Created by Leo on 2018/6/22.
+ * desc：微博分享</br>
+ * author：Leo </br>
  */
 public class WeiboShareInstance implements ShareInstance {
 
@@ -130,7 +130,7 @@ public class WeiboShareInstance implements ShareInstance {
                 .subscribe(new Consumer<Pair<String, byte[]>>() {
                     @Override
                     public void accept(@NonNull Pair<String, byte[]> stringPair) {
-                        handleShare(stringPair, title, targetUrl, summary);
+                        handleShare(stringPair, title, targetUrl, summary, listener);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -162,7 +162,7 @@ public class WeiboShareInstance implements ShareInstance {
                 .subscribe(new Consumer<Pair<String, byte[]>>() {
                     @Override
                     public void accept(@NonNull Pair<String, byte[]> stringPair) {
-                        handleShare(stringPair, title, targetUrl, summary);
+                        handleShare(stringPair, title, targetUrl, summary, listener);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -174,7 +174,11 @@ public class WeiboShareInstance implements ShareInstance {
                 });
     }
 
-    private void handleShare(Pair<String, byte[]> stringPair, String title, String targetUrl, String summary) {
+    private void handleShare(Pair<String, byte[]> stringPair, String title, String targetUrl
+            , String summary, ShareListener listener) {
+        if (listener != null) {
+            listener.shareStart();
+        }
 
         WeiboMultiMessage message = new WeiboMultiMessage();
         if (!TextUtils.isEmpty(summary)) {

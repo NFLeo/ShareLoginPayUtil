@@ -32,7 +32,7 @@ public class DefaultShareInstance implements ShareInstance {
 
     @Override
     public void shareText(int platform, String text, Activity activity, ShareListener listener) {
-        handleShare(activity, SHARE_TYPE_TEXT, "", "", text, null);
+        handleShare(activity, SHARE_TYPE_TEXT, "", "", text, null, listener);
     }
 
     @Override
@@ -48,7 +48,12 @@ public class DefaultShareInstance implements ShareInstance {
         createImageShare(title, targetUrl, summary, shareImageObject, activity, listener);
     }
 
-    private void handleShare(Activity activity, int type, String title, String targetUrl, String summary, Uri imageUri) {
+    private void handleShare(Activity activity, int type, String title, String targetUrl
+            , String summary, Uri imageUri, ShareListener listener) {
+        if (listener != null) {
+            listener.shareStart();
+        }
+
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_SUBJECT, title);
@@ -92,7 +97,7 @@ public class DefaultShareInstance implements ShareInstance {
                 .subscribe(new Consumer<Uri>() {
                     @Override
                     public void accept(@NonNull Uri uri) {
-                        handleShare(activity, SHARE_TYPE_IMAGE, title, targetUrl, summary, uri);
+                        handleShare(activity, SHARE_TYPE_IMAGE, title, targetUrl, summary, uri, listener);
                     }
                 }, new Consumer<Throwable>() {
                     @Override

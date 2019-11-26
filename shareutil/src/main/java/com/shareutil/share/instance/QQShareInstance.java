@@ -39,8 +39,8 @@ public class QQShareInstance implements ShareInstance {
     private Disposable mShareFunc;
     private Disposable mShareImage;
 
-    public QQShareInstance(Context context, String app_id) {
-        mTencent = Tencent.createInstance(app_id, context.getApplicationContext());
+    public QQShareInstance(Context context, String appId) {
+        mTencent = Tencent.createInstance(appId, context.getApplicationContext());
     }
 
     @Override
@@ -174,6 +174,9 @@ public class QQShareInstance implements ShareInstance {
             return;
         }
 
+        if (listener != null) {
+            listener.shareStart();
+        }
         final Bundle params = new Bundle();
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
         params.putString(QQShare.SHARE_TO_QQ_TITLE, title);
@@ -191,7 +194,9 @@ public class QQShareInstance implements ShareInstance {
             activity.finish();
             return;
         }
-
+        if (listener != null) {
+            listener.shareStart();
+        }
         Bundle params = new Bundle();
         params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_IMAGE);
         params.putString(QQShare.SHARE_TO_QQ_IMAGE_LOCAL_URL, localUrl);
@@ -206,7 +211,9 @@ public class QQShareInstance implements ShareInstance {
             activity.finish();
             return;
         }
-
+        if (listener != null) {
+            listener.shareStart();
+        }
         final Bundle params = new Bundle();
         params.putInt(QzoneShare.SHARE_TO_QZONE_KEY_TYPE,
                 QzonePublish.PUBLISH_TO_QZONE_TYPE_PUBLISHMOOD);
@@ -223,7 +230,9 @@ public class QQShareInstance implements ShareInstance {
             activity.finish();
             return;
         }
-
+        if (listener != null) {
+            listener.shareStart();
+        }
         final Bundle params = new Bundle();
         final ArrayList<String> image = new ArrayList<>();
         image.add(imageUrl);
@@ -244,7 +253,9 @@ public class QQShareInstance implements ShareInstance {
             activity.finish();
             return;
         }
-
+        if (listener != null) {
+            listener.shareStart();
+        }
         final Bundle params = new Bundle();
         final ArrayList<String> image = new ArrayList<>();
         image.add(imagePath);

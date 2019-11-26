@@ -10,11 +10,15 @@
     7. 支持Instagram、Google、FaceBook、Twitter海外登录方式，调用方式一致
 ```
 
+[ ![](https://api.bintray.com/packages/nfleo/ShareLoginPayUtil/ShareLoginPayUtil/images/download.svg) ](https://bintray.com/nfleo/ShareLoginPayUtil/ShareLoginPayUtil/_latestVersion)
+
 ## TODO
 - 支持多图分享
 - 支持视频分享
 
 ## ChangeLog
+#### 2019-11-26
+- 分享添加分享开始回调
 
 #### 2019-05-30
 - 添加并测试成功Twitter登录
@@ -103,8 +107,7 @@
         ...
     }
 
-    // 新版本发布不了，只能通过aar方式了
-    // api 'com.nfleo:ShareLoginPayUtil:1.1.1'
+    api 'com.nfleo:ShareLoginPayUtil:1.1.2'
 ```
 2. 项目build.gradle 中添加如下代码
 ```

@@ -35,6 +35,10 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
+/**
+ * desc：微信分享</br>
+ * author：Leo </br>
+ */
 public class WxShareInstance implements ShareInstance {
 
     /**
@@ -55,6 +59,9 @@ public class WxShareInstance implements ShareInstance {
 
     @Override
     public void shareText(int platform, String text, Activity activity, ShareListener listener) {
+        if (listener != null) {
+            listener.shareStart();
+        }
         WXTextObject textObject = new WXTextObject();
         textObject.text = text;
 
@@ -71,20 +78,26 @@ public class WxShareInstance implements ShareInstance {
     }
 
     @Override
-    public void shareMedia(int platform, String title, String targetUrl, String summary, String miniId, String miniPath, ShareImageObject shareImageObject, boolean shareImmediate, Activity activity, ShareListener listener) {
+    public void shareMedia(int platform, String title, String targetUrl, String summary
+            , String miniId, String miniPath, ShareImageObject shareImageObject
+            , boolean shareImmediate, Activity activity, ShareListener listener) {
         // 直接分享，外部处理好分享图片
         if (shareImmediate) {
             if (shareImageObject.getBytes() != null) {
-                handleshareWx(platform, title, targetUrl, summary, shareImageObject.getBytes(), miniId, miniPath);
+                handleShareWx(platform, title, targetUrl, summary
+                        , shareImageObject.getBytes(), miniId, miniPath, listener);
             }
         } else {
-            shareFunc(platform, title, targetUrl, summary, miniId, miniPath, shareImageObject, activity, listener);
+            shareFunc(platform, title, targetUrl, summary, miniId, miniPath
+                    , shareImageObject, activity, listener);
         }
     }
 
     @SuppressLint("CheckResult")
-    private void shareFunc(final int platform, final String title, final String targetUrl, final String summary, final String miniId, final String miniPath,
-                           final ShareImageObject shareImageObject, final Activity activity, final ShareListener listener) {
+    private void shareFunc(final int platform, final String title, final String targetUrl
+            , final String summary, final String miniId, final String miniPath
+            , final ShareImageObject shareImageObject
+            , final Activity activity, final ShareListener listener) {
 
         mShareFunc = Flowable.create(new FlowableOnSubscribe<byte[]>() {
             @Override
@@ -101,7 +114,8 @@ public class WxShareInstance implements ShareInstance {
                 .observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<byte[]>() {
                     @Override
                     public void accept(@NonNull byte[] bytes) {
-                        handleshareWx(platform, title, targetUrl, summary, bytes, miniId, miniPath);
+                        handleShareWx(platform, title, targetUrl, summary
+                                , bytes, miniId, miniPath, listener);
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -113,8 +127,13 @@ public class WxShareInstance implements ShareInstance {
                 });
     }
 
-    private void handleshareWx(final int platform, final String title, final String targetUrl, final String summary,
-                               byte[] bytes, final String miniId, final String miniPath) {
+    private void handleShareWx(final int platform, final String title, final String targetUrl
+            , final String summary, byte[] bytes, final String miniId
+            , final String miniPath, ShareListener shareListener) {
+
+        if (shareListener != null) {
+            shareListener.shareStart();
+        }
         WXMediaMessage message;
         WXMiniProgramObject miniProgramObject = null;
         WXWebpageObject webpageObject = null;
