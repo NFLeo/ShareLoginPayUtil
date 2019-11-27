@@ -24,7 +24,7 @@ public class _ShareActivity extends Activity {
         }
 
         Intent intent = new Intent(context, _ShareActivity.class);
-        if (context instanceof Application) {
+        if (!(context instanceof Activity)) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
         intent.putExtra(TYPE, type);
