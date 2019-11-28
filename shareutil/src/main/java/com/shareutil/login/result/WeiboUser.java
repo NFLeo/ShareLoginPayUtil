@@ -63,7 +63,7 @@ public class WeiboUser extends BaseUser {
 
     public static WeiboUser parse(JSONObject jsonObject) throws JSONException {
         WeiboUser user = new WeiboUser();
-        user.setOpenId(String.valueOf(jsonObject.getInt("id")));
+        user.setOpenId(String.valueOf(jsonObject.getString("id")));
         user.setNickname(jsonObject.getString("screen_name"));
 
         // 性别
